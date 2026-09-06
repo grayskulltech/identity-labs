@@ -29,7 +29,7 @@ This also closes the availability finding from the review. ISP down means the ph
 
 ### Identity provider is self-hosted
 
-Personal track: Authentik or Keycloak on the lab host, OIDC with PKCE, passkeys for the family, device-bound refresh tokens, DPoP on every gateway request. Cisco track: Duo SSO with Passwordless and Device Health, same OIDC client configuration on the phone.
+Personal track: Authentik or Keycloak on the lab host, OIDC with PKCE, passkeys for the family, device-bound refresh tokens, DPoP on every gateway request. How the person, the device, and human presence are bound to Apple primitives is in [ADR-003](adr-003-apple-native-identity-binding.md). Cisco track: Duo SSO with Passwordless and Device Health, same OIDC client configuration on the phone.
 
 Running your own IdP is a critical dependency. Guardrails, not effort: pinned container images, Renovate for version bumps, nightly encrypted backup of the IdP database to a second host, a documented restore drill, and a break-glass local admin account stored offline.
 
