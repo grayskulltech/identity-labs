@@ -14,7 +14,7 @@ Status: accepted. Supersedes the open decisions in section 7 of the design revie
 |---|---|---|
 | 0 | Voice, transcript, intent extraction, model context | The phone only. Foundation Models framework runs exclusively on-device. Siri features that route to Private Cloud Compute are not used for CastleOps actions. |
 | 1 | Policy decisions, tool arguments, tool execution, audit log, identity records | Kingsbrook LAN only. Self-hosted identity provider, gateway, policy engine, log store. |
-| 2 | Opaque references only | May transit a third party. Examples: an APNs push carrying a transaction ID and nothing else; a WireGuard or Tailscale control plane exchanging keys and endpoints. |
+| 2 | Opaque references only | May transit a third party. Examples: an APNs push carrying a transaction ID or an MDM wake token and nothing else; a WireGuard or Tailscale control plane exchanging keys and endpoints; Apple attesting its own device hardware to the LAN certificate authority. |
 | 3 | Names, calendar contents, SSIDs, device inventory, guest identities, argument values | Never leave the LAN. Never appear in a push body, a cloud log, or a SaaS authz request. |
 
 A component that cannot satisfy its tier is not "configured carefully". It is replaced or moved to the Cisco track.

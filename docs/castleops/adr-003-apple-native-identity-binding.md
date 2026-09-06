@@ -1,6 +1,6 @@
 # ADR-003: Treating the phone as a proper Apple identity
 
-Status: accepted. Replaces the "phone as NHI" model in the v0 spec with Apple's own identity primitives, bound to the self-hosted IdP.
+Status: accepted, amended by [ADR-004](adr-004-managed-device-attestation.md), which makes attested device posture a requirement rather than the upgrade path described below.
 
 ## Decision
 
@@ -22,7 +22,7 @@ Agents remain Non-Human Identities in Authentik, reached by token exchange, exac
 
 **Plain DPoP with an app-generated key.** It binds the token to a key, but nothing proves the key lives in a Secure Enclave on a real device in our app. App Attest proves all three and still gives sender-constrained requests. The DPoP shape from the design review is kept; the key underneath it becomes the attested key.
 
-**MDM as the first move.** Managed Device Attestation gives attested OS version and serial, which App Attest does not. It also means Apple Business Manager, Managed Apple Accounts from Grayskull on family phones, and a management profile on a teenager's device. That entangles Grayskull's business identity with the household and is more than the household needs on day one. It is the documented upgrade path if attested posture becomes a requirement, not the starting point.
+**MDM as the first move.** Superseded. ADR-004 makes attested posture a requirement and adopts an unsupervised, self-hosted MDM with a minimal payload set and no Apple Business Manager, which avoids the Grayskull entanglement this paragraph originally objected to.
 
 **DeviceCheck.** Requires Apple's server on every query. Excluded.
 
