@@ -237,15 +237,15 @@
       </div>
       <div class="tile">
         <div class="label">Checks</div>
-        <div class="value">195</div>
-        <div class="bar" role="img" aria-label="110 ok, 61 warn, 24 err">
-          <span class="ok" style="flex: 110"></span><span class="warn" style="flex: 61"></span><span class="err" style="flex: 24"></span>
+        <div class="value">163</div>
+        <div class="bar" role="img" aria-label="101 ok, 41 warn, 21 err">
+          <span class="ok" style="flex: 101"></span><span class="warn" style="flex: 41"></span><span class="err" style="flex: 21"></span>
         </div>
-        <div class="legend"><span><b>110</b> ok</span><span><b>61</b> warn</span><span><b>24</b> err</span></div>
+        <div class="legend"><span><b>101</b> ok</span><span><b>41</b> warn</span><span><b>21</b> err</span><span><b>32</b> retired</span></div>
       </div>
       <div class="tile">
         <div class="label">Actions today</div>
-        <div class="value">9</div>
+        <div class="value">8</div>
         <div class="sub">2 more to note, no action</div>
       </div>
       <div class="tile">
@@ -262,62 +262,47 @@
       <article class="act RED">
         <div class="n">01</div>
         <div class="body">
-          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer A: Telephony, Admin, Trust Monitor stalled</h3></div>
-          <p class="why">Telephony, Admin, Trust Monitor stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d, Trust Monitor 249d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer A: Telephony, Admin stalled</h3></div>
+          <p class="why">Telephony, Admin stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
           <div class="tags"><span class="tag">tenant-a</span></div>
           <pre class="cmd">docker restart tenant-a-duologsync
 <span class="c"># only if the restart does not clear it</span>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-a-dls
 <span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=tenant-a &amp;&amp; python pull.py --logs-only   # streams: telephony, trust_monitor
+set DUO_TENANT_SLUG=tenant-a &amp;&amp; python pull.py --logs-only   # streams: telephony
 python pull_activity.py --tenant tenant-a</pre>
         </div>
       </article>
       <article class="act RED">
         <div class="n">02</div>
         <div class="body">
-          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer B: Telephony, Trust Monitor stalled</h3></div>
-          <p class="why">Telephony, Trust Monitor stopped arriving while auth is still flowing, so the container is alive but these streams are dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer B: Telephony stalled</h3></div>
+          <p class="why">Telephony stopped arriving while auth is still flowing, so the container is alive but this stream is dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
           <div class="tags"><span class="tag">tenant-b</span></div>
           <pre class="cmd">docker restart tenant-b-duologsync
 <span class="c"># only if the restart does not clear it</span>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-b-dls
 <span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=tenant-b &amp;&amp; python pull.py --logs-only   # streams: telephony, trust_monitor</pre>
+set DUO_TENANT_SLUG=tenant-b &amp;&amp; python pull.py --logs-only   # streams: telephony</pre>
         </div>
       </article>
       <article class="act RED">
         <div class="n">03</div>
         <div class="body">
-          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer C: Admin, Trust Monitor stalled</h3></div>
-          <p class="why">Admin, Trust Monitor stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer C: Admin stalled</h3></div>
+          <p class="why">Admin stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
           <div class="tags"><span class="tag">tenant-c</span></div>
           <pre class="cmd">docker restart tenant-c-duologsync
 <span class="c"># only if the restart does not clear it</span>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-c-dls
-<span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=tenant-c &amp;&amp; python pull.py --logs-only   # streams: trust_monitor
 python pull_activity.py --tenant tenant-c</pre>
         </div>
       </article>
       <article class="act RED">
         <div class="n">04</div>
         <div class="body">
-          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer D: Trust Monitor stalled</h3></div>
-          <p class="why">Trust Monitor stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Trust Monitor 231d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
-          <div class="tags"><span class="tag">tenant-d</span></div>
-          <pre class="cmd">docker restart tenant-d-duologsync
-<span class="c"># only if the restart does not clear it</span>
-docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-d-dls
-<span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=tenant-d &amp;&amp; python pull.py --logs-only   # streams: trust_monitor</pre>
-        </div>
-      </article>
-      <article class="act RED">
-        <div class="n">05</div>
-        <div class="body">
-          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant B (Advantage): Auth, Telephony, Admin, Trust Monitor not flowing</h3></div>
-          <p class="why">Auth, Telephony, Trust Monitor never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.</p>
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant B (Advantage): Auth, Telephony, Admin not flowing</h3></div>
+          <p class="why">Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.</p>
           <div class="tags"><span class="tag">lab-b</span></div>
           <pre class="cmd"><span class="c"># first: unblock the merge</span>
 python schema_drift.py --tenant lab-b --apply
@@ -325,15 +310,15 @@ docker restart lab-b-duologsync
 <span class="c"># only if the restart does not clear it</span>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-b-dls
 <span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=lab-b &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor
+set DUO_TENANT_SLUG=lab-b &amp;&amp; python pull.py --logs-only   # streams: auth, telephony
 python pull_activity.py --tenant lab-b</pre>
         </div>
       </article>
       <article class="act RED">
-        <div class="n">06</div>
+        <div class="n">05</div>
         <div class="body">
-          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant C (Essentials): Auth, Telephony, Admin, Trust Monitor not flowing</h3></div>
-          <p class="why">Auth, Telephony, Trust Monitor never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.</p>
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant C (Essentials): Auth, Telephony, Admin not flowing</h3></div>
+          <p class="why">Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.</p>
           <div class="tags"><span class="tag">lab-c</span></div>
           <pre class="cmd"><span class="c"># first: unblock the merge</span>
 python schema_drift.py --tenant lab-c --apply
@@ -341,26 +326,26 @@ docker restart lab-c-duologsync
 <span class="c"># only if the restart does not clear it</span>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-c-dls
 <span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=lab-c &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor
+set DUO_TENANT_SLUG=lab-c &amp;&amp; python pull.py --logs-only   # streams: auth, telephony
 python pull_activity.py --tenant lab-c</pre>
         </div>
       </article>
       <article class="act AMBER">
-        <div class="n">07</div>
+        <div class="n">06</div>
         <div class="body">
-          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Customer E (Non-Production): Auth, Telephony, Admin, Trust Monitor not flowing</h3></div>
-          <p class="why">Trust Monitor never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for this stream. Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
+          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Customer E (Non-Production): Auth, Telephony, Admin stalled</h3></div>
+          <p class="why">Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
           <div class="tags"><span class="tag">tenant-e</span></div>
           <pre class="cmd">docker restart tenant-e-duologsync
 <span class="c"># only if the restart does not clear it</span>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls
 <span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=tenant-e &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor
+set DUO_TENANT_SLUG=tenant-e &amp;&amp; python pull.py --logs-only   # streams: auth, telephony
 python pull_activity.py --tenant tenant-e</pre>
         </div>
       </article>
       <article class="act AMBER">
-        <div class="n">08</div>
+        <div class="n">07</div>
         <div class="body">
           <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>API pull has not completed in over 24h for 3 tenants</h3></div>
           <p class="why">The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report&#39;s scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.</p>
@@ -371,20 +356,20 @@ nssm status Duo-Analytics</pre>
         </div>
       </article>
       <article class="act AMBER">
-        <div class="n">09</div>
+        <div class="n">08</div>
         <div class="body">
-          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Lab Tenant A (Premier): Auth, Telephony, Trust Monitor stalled</h3></div>
-          <p class="why">Auth, Telephony, Trust Monitor stopped arriving. DLS checkpoints are old (Telephony 51d, Trust Monitor 85d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
+          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Lab Tenant A (Premier): Auth, Telephony stalled</h3></div>
+          <p class="why">Auth, Telephony stopped arriving. DLS checkpoints are old (Telephony 51d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
           <div class="tags"><span class="tag">lab-a</span></div>
           <pre class="cmd">docker restart lab-a-duologsync
 <span class="c"># only if the restart does not clear it</span>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-a-dls
 <span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor</pre>
+set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: auth, telephony</pre>
         </div>
       </article>
       <article class="act INFO">
-        <div class="n">10</div>
+        <div class="n">09</div>
         <div class="body">
           <div class="head"><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span><h3>3 containers restarted just before this run</h3></div>
           <p class="why">tenant-a-duologsync up 52 seconds, lab-c-duologsync up about a minute, tenant-d-duologsync up about a minute. Health is still &#39;starting&#39;, so today&#39;s freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.</p>
@@ -392,7 +377,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
         </div>
       </article>
       <article class="act INFO">
-        <div class="n">11</div>
+        <div class="n">10</div>
         <div class="body">
           <div class="head"><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span><h3>SLO history exists for only 1 of 8 tenants</h3></div>
           <p class="why">Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.</p>
@@ -409,12 +394,12 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
         <thead>
           <tr>
             <th>Tenant</th>
-<th>Auth</th><th>Telephony</th><th>Admin</th><th>Trust Monitor</th>            <th>API pull</th>
+<th>Auth</th><th>Telephony</th><th>Admin</th>            <th>API pull</th>
             <th>Staging</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="group"><td colspan="7">Customer tenants</td></tr>
+          <tr class="group"><td colspan="6">Customer tenants</td></tr>
           <tr>
             <td class="tenant"><div class="name">Customer A</div><div class="slug">tenant-a · Duo Advantage</div></td>
 <td class="cell">
@@ -423,9 +408,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v RED"><span class="g" aria-hidden="true">■</span>24.8h<span class="sr" hidden>ERR</span></div>
 <div class="s">0 rows/24h</div><div class="s">limit 4h</div><div class="cp">checkpoint 142d old</div></td><td class="cell">
   <div class="v RED"><span class="g" aria-hidden="true">■</span>35.1h<span class="sr" hidden>ERR</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 109d old</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>41.6h<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 249d old</div></td>            <td class="cell">
+<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 109d old</div></td>            <td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>54m<span class="sr" hidden>OK</span></div>
 <div class="s">+0 auth / +0 tel</div></td>
             <td class="cell">
@@ -440,9 +423,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v RED"><span class="g" aria-hidden="true">■</span>13.8h<span class="sr" hidden>ERR</span></div>
 <div class="s">26 rows/24h</div><div class="s">limit 4h</div></td><td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>10.4h<span class="sr" hidden>OK</span></div>
-<div class="s">7 rows/24h</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>3d<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 24h</div></td>            <td class="cell">
+<div class="s">7 rows/24h</div></td>            <td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>4h<span class="sr" hidden>OK</span></div>
 <div class="s">+0 auth / +0 tel</div></td>
             <td class="cell">
@@ -457,9 +438,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>3.6h<span class="sr" hidden>OK</span></div>
 <div class="s">30 rows/24h</div></td><td class="cell">
   <div class="v RED"><span class="g" aria-hidden="true">■</span>2d<span class="sr" hidden>ERR</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 116d old</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>41.2h<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div></td>            <td class="cell">
+<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 116d old</div></td>            <td class="cell">
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>26.9h<span class="sr" hidden>WARN</span></div>
 <div class="s">+1 auth / +0 tel</div></td>
             <td class="cell">
@@ -474,9 +453,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.1h<span class="sr" hidden>OK</span></div>
 <div class="s">221 rows/24h</div></td><td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.1h<span class="sr" hidden>OK</span></div>
-<div class="s">262 rows/24h</div><div class="cp">checkpoint 138d old</div></td><td class="cell">
-  <div class="v RED"><span class="g" aria-hidden="true">■</span>37.9h<span class="sr" hidden>ERR</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 231d old</div></td>            <td class="cell">
+<div class="s">262 rows/24h</div><div class="cp">checkpoint 138d old</div></td>            <td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1h<span class="sr" hidden>OK</span></div>
 <div class="s">+9.5K auth / +110 tel</div></td>
             <td class="cell">
@@ -491,16 +468,14 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>2d<span class="sr" hidden>WARN</span></div>
 <div class="s">0 rows/24h</div></td><td class="cell">
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>44.2h<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
-<div class="s">never received</div><div class="cp">checkpoint missing</div></td>            <td class="cell">
+<div class="s">0 rows/24h</div></td>            <td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.4h<span class="sr" hidden>OK</span></div>
 <div class="s">+1 auth / +0 tel</div></td>
             <td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
 </td>
           </tr>
-          <tr class="group"><td colspan="7">Lab tenants</td></tr>
+          <tr class="group"><td colspan="6">Lab tenants</td></tr>
           <tr>
             <td class="tenant"><div class="name">Lab Tenant A (Premier)</div><div class="slug">lab-a · Duo Premier</div></td>
 <td class="cell">
@@ -509,9 +484,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>51d<span class="sr" hidden>WARN</span></div>
 <div class="s">0 rows/24h</div><div class="s">limit 7d</div><div class="cp">checkpoint 51d old</div></td><td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>36m<span class="sr" hidden>OK</span></div>
-<div class="s">94 rows/24h</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>85d<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 7d</div><div class="cp">checkpoint 85d old</div></td>            <td class="cell">
+<div class="s">94 rows/24h</div></td>            <td class="cell">
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>27.5h<span class="sr" hidden>WARN</span></div>
 <div class="s">+1 auth / +0 tel</div></td>
             <td class="cell">
@@ -526,9 +499,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
 <div class="s">never received</div><div class="cp">checkpoint missing</div></td><td class="cell">
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>44h<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
-<div class="s">never received</div><div class="cp">checkpoint missing</div></td>            <td class="cell">
+<div class="s">0 rows/24h</div></td>            <td class="cell">
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>27h<span class="sr" hidden>WARN</span></div>
 <div class="s">+0 auth / +0 tel</div></td>
             <td class="cell">
@@ -543,9 +514,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
 <div class="s">never received</div><div class="cp">checkpoint missing</div></td><td class="cell">
   <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>2d<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div><div class="cp">checkpoint 27d old</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
-<div class="s">never received</div><div class="cp">checkpoint missing</div></td>            <td class="cell">
+<div class="s">0 rows/24h</div><div class="cp">checkpoint 27d old</div></td>            <td class="cell">
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.9h<span class="sr" hidden>OK</span></div>
 <div class="s">+0 auth / +0 tel</div></td>
             <td class="cell">
@@ -561,7 +530,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
       <span><span class="mono">●</span> ok</span>
       <span>Second line: rows landed in the last 24h and the freshness limit where one applies.</span>
       <span>Orange note: the DLS checkpoint file is older than 7 days or missing, so DLS is not the source of what did arrive.</span>
-    </div>
+<span>Retired: Trust Monitor (32 checks dropped from the counts; the stream is deprecated in Duo).</span>    </div>
   </section>
 
   <section id="tenants">
@@ -579,7 +548,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="headline">Telephony freshness last row 2026-09-05 10:15 UTC (24.8h ago, limit 4h); Telephony ingest 0 rows in 24h (8.1M lifetime)</div>
         </div>
         <div class="counts">
-<span class="chip RED">10 err</span><span class="chip AMBER">6 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">10 err</span><span class="chip AMBER">3 warn</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
@@ -596,9 +565,6 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">SLO ingest volume</div><div class="text">63.6% over 33 daily samples (2026-08-07 to 2026-09-05)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony volume</div><div class="text">yesterday 505 vs same-weekday median 1,542</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 972</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-09-04 17:25 UTC (41.6h ago, limit 24h)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (3.8K lifetime)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2025-12-31 03:21 UTC (249d old)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">5 ERROR lines in the last 200 log lines</div></div>
         </div>
         <div class="facts">
@@ -631,18 +597,15 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
         <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
         <div class="who">
           <div class="name">Customer B <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">tenant-b · ACCT02 · Duo Advantage</span></div>
-          <div class="headline">Telephony freshness last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h); Trust Monitor freshness last row 2026-09-03 16:04 UTC (3d ago, limit 24h)</div>
+          <div class="headline">Telephony freshness last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h)</div>
         </div>
         <div class="counts">
-<span class="chip RED">1 err</span><span class="chip AMBER">3 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">1 err</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
         <div class="issues">
           <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Telephony freshness</div><div class="text">last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-09-03 16:04 UTC (3d ago, limit 24h)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (63 lifetime)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-09-03 16:04 UTC (3d old)</div></div>
         </div>
         <div class="facts">
           <div class="fact"><div class="k">Active users</div><div class="v">600</div></div>
@@ -677,7 +640,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="headline">Admin freshness last row 2026-09-04 07:43 UTC (2d ago, limit 24h); Admin ingest 0 rows in 24h (5.9M lifetime)</div>
         </div>
         <div class="counts">
-<span class="chip RED">3 err</span><span class="chip AMBER">4 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">3 err</span><span class="chip AMBER">2 warn</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
@@ -686,8 +649,6 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (5.9M lifetime)</div></div>
           <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-05-13 16:08 UTC (116d old)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 631</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (458 lifetime)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-09-04 17:45 UTC (41.2h old)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">API pull</div><div class="text">last completed 2026-09-05 08:07 UTC (26.9h ago)</div></div>
         </div>
         <div class="facts">
@@ -723,7 +684,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="headline">Gaps (30d) 22 days with no data. Includes 2026-08-27, 2026-08-28, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (1.3K lifetime)</div>
         </div>
         <div class="counts">
-<span class="chip RED">1 err</span><span class="chip AMBER">9 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">1 err</span><span class="chip AMBER">6 warn</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
@@ -734,9 +695,6 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony freshness</div><div class="text">last row 2026-07-17 01:26 UTC (51d ago, limit 7d)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony ingest</div><div class="text">0 rows in 24h (14 lifetime)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony checkpoint</div><div class="text">DLS checkpoint 2026-07-17 01:26 UTC (51d old)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-06-13 13:20 UTC (85d ago, limit 7d)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (1 lifetime)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-06-13 13:20 UTC (85d old)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">API pull</div><div class="text">last completed 2026-09-05 07:30 UTC (27.5h ago)</div></div>
         </div>
         <div class="facts">
@@ -772,7 +730,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="headline">Schema drift 5 tables missing merge columns, 1,726 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05</div>
         </div>
         <div class="counts">
-<span class="chip RED">2 err</span><span class="chip AMBER">13 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">2 err</span><span class="chip AMBER">10 warn</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
@@ -787,9 +745,6 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony checkpoint</div><div class="text">checkpoint file missing in container</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (1.1K lifetime)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-09-04 15:02 UTC (44h old)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">no rows ever received</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">checkpoint file missing in container</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">API pull</div><div class="text">last completed 2026-09-05 08:00 UTC (27h ago)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">1 ERROR lines in the last 200 log lines</div></div>
         </div>
@@ -826,7 +781,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="headline">Schema drift 5 tables missing merge columns, 16 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05</div>
         </div>
         <div class="counts">
-<span class="chip RED">2 err</span><span class="chip AMBER">13 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">2 err</span><span class="chip AMBER">10 warn</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
@@ -842,9 +797,6 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (41.4K lifetime)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 631</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-08-10 14:14 UTC (27d old)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">no rows ever received</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">checkpoint file missing in container</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">5 ERROR lines in the last 200 log lines</div></div>
         </div>
         <div class="facts">
@@ -877,18 +829,15 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
         <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
         <div class="who">
           <div class="name">Customer D <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">tenant-d · ACCT07 · Duo Premier</span></div>
-          <div class="headline">Admin checkpoint DLS checkpoint 2026-04-21 22:39 UTC (138d old); Trust Monitor freshness last row 2026-09-04 21:08 UTC (37.9h ago, limit 24h)</div>
+          <div class="headline">Admin checkpoint DLS checkpoint 2026-04-21 22:39 UTC (138d old); Container log 5 ERROR lines in the last 200 log lines</div>
         </div>
         <div class="counts">
-<span class="chip RED">4 err</span><span class="chip AMBER">2 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">1 err</span><span class="chip AMBER">2 warn</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
         <div class="issues">
           <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-04-21 22:39 UTC (138d old)</div></div>
-          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-09-04 21:08 UTC (37.9h ago, limit 24h)</div></div>
-          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (1.9K lifetime)</div></div>
-          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-01-17 23:09 UTC (231d old)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">5 ERROR lines in the last 200 log lines</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony credits</div><div class="text">278 credits across 221 transactions in 24h</div></div>
         </div>
@@ -925,7 +874,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="headline">Gaps (30d) 9 days with no data. Includes 2026-08-22, 2026-08-23, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (2.5K lifetime)</div>
         </div>
         <div class="counts">
-<span class="chip RED">1 err</span><span class="chip AMBER">11 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+<span class="chip RED">1 err</span><span class="chip AMBER">8 warn</span>          <span class="caret" aria-hidden="true">▶</span>
         </div>
       </summary>
       <div class="tbody">
@@ -938,9 +887,6 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (147.9K lifetime)</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 632</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-09-04 14:50 UTC (44.2h old)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">no rows ever received</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
-          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">checkpoint file missing in container</div></div>
           <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">1 ERROR lines in the last 200 log lines</div></div>
         </div>
         <div class="facts">
@@ -1000,7 +946,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
         <div class="kv">
           <span class="k">Restart DLS</span><code>docker restart &lt;slug&gt;-duologsync</code>
           <span class="k">Recreate DLS</span><code>docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps &lt;slug&gt;-dls</code>
-          <span class="k">Pull logs</span><code>set DUO_TENANT_SLUG=&lt;slug&gt; &amp;&amp; python pull.py --logs-only   # streams: auth | telephony | trust_monitor</code>
+          <span class="k">Pull logs</span><code>set DUO_TENANT_SLUG=&lt;slug&gt; &amp;&amp; python pull.py --logs-only   # streams: auth | telephony</code>
           <span class="k">Pull admin</span><code>python pull_activity.py --tenant &lt;slug&gt;</code>
           <span class="k">Fix drift</span><code>python schema_drift.py --tenant &lt;slug&gt; --apply</code>
         </div>

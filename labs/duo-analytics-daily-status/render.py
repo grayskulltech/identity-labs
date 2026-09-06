@@ -21,12 +21,17 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 HERE = Path(__file__).resolve().parent
 
-STREAMS = [
+ALL_STREAMS = [
     ("auth", "Auth", "auth_logs"),
     ("telephony", "Telephony", "telephony_logs"),
     ("admin", "Admin", "admin_logs"),
     ("trust_monitor", "Trust Monitor", "trust_monitor_events"),
 ]
+# Streams the collector still emits but that must not alert. Trust Monitor is
+# deprecated in Duo, so its freshness, ingest, volume and checkpoint checks are
+# dropped from the action queue, the matrix, the issue lists and the counts.
+DEPRECATED_STREAMS = {"trust_monitor"}
+STREAMS = [s for s in ALL_STREAMS if s[0] not in DEPRECATED_STREAMS]
 
 # Recovery commands, printed once per action instead of once per failing row.
 RUNBOOK = {
@@ -287,11 +292,33 @@ def derive_actions(model: dict) -> list[dict]:
     return actions
 
 
+def retire_deprecated(model: dict) -> int:
+    """Remove deprecated-stream checks from the collector's counts. Returns how many were retired."""
+    s = model["summary"]
+    retired = 0
+    for t in model["tenants"]:
+        for key in DEPRECATED_STREAMS:
+            st = t["streams"].get(key)
+            if not st:
+                continue
+            for part in ("freshness", "ingest", "dow", "checkpoint"):
+                status = st[part]["status"]
+                bucket = {"RED": "err", "AMBER": "warn", "GREEN": "ok"}.get(status)
+                if bucket:
+                    s[bucket] = max(0, s[bucket] - 1)
+                retired += 1
+    s["retired"] = retired
+    return retired
+
+
 def enrich(model: dict) -> dict:
     tenants = model["tenants"]
+    retire_deprecated(model)
     for t in tenants:
         t["cells"] = {k: stream_cell(t["streams"][k]) for k, _, _ in STREAMS}
         t["issues"] = tenant_issues(t)
+        # Status is recomputed from what is left once deprecated checks are gone.
+        t["status"] = worst(*(i["status"] for i in t["issues"] if i["status"] in ("RED", "AMBER")))
         t["err"] = sum(1 for i in t["issues"] if i["status"] == "RED")
         t["warn"] = sum(1 for i in t["issues"] if i["status"] == "AMBER")
         t["headline"] = "; ".join(f"{i['check']} {i['text']}" for i in t["issues"][:2]) or "all checks OK"
@@ -325,6 +352,7 @@ def enrich(model: dict) -> dict:
     s["tenants_amber"] = sum(1 for t in tenants if t["status"] == "AMBER")
     s["tenants_green"] = sum(1 for t in tenants if t["status"] == "GREEN")
     r = model["report"]
+    r["overall"] = worst(*(t["status"] for t in tenants))
     ts = datetime.fromisoformat(r["generated_at"].replace("Z", "+00:00"))
     r["date_long"] = ts.strftime("%A %-d %B %Y")
     r["time_utc"] = ts.strftime("%H:%M UTC")
@@ -377,6 +405,7 @@ def render(model: dict, anonymize_output: bool = False) -> str:
     env.filters.update({"age": fmt_age, "int": fmt_int, "compact": fmt_compact, "mb": fmt_mb, "ts": fmt_ts,
                         "duration": fmt_duration, "sev": sev_label, "glyph": sev_glyph, "human": humanize_check})
     env.globals["STREAMS"] = STREAMS
+    env.globals["DEPRECATED"] = [label for key, label, _ in ALL_STREAMS if key in DEPRECATED_STREAMS]
     env.globals["RUNBOOK"] = RUNBOOK
     return env.get_template("daily_status.html.j2").render(m=model)
 

@@ -252,7 +252,7 @@
         <div class="bar" role="img" aria-label="{{ m.summary.ok }} ok, {{ m.summary.warn }} warn, {{ m.summary.err }} err">
           <span class="ok" style="flex: {{ m.summary.ok }}"></span><span class="warn" style="flex: {{ m.summary.warn }}"></span><span class="err" style="flex: {{ m.summary.err }}"></span>
         </div>
-        <div class="legend"><span><b>{{ m.summary.ok }}</b> ok</span><span><b>{{ m.summary.warn }}</b> warn</span><span><b>{{ m.summary.err }}</b> err</span></div>
+        <div class="legend"><span><b>{{ m.summary.ok }}</b> ok</span><span><b>{{ m.summary.warn }}</b> warn</span><span><b>{{ m.summary.err }}</b> err</span>{% if m.summary.retired %}<span><b>{{ m.summary.retired }}</b> retired</span>{% endif %}</div>
       </div>
       <div class="tile">
         <div class="label">Actions today</div>
@@ -327,6 +327,7 @@
       <span><span class="mono">●</span> ok</span>
       <span>Second line: rows landed in the last 24h and the freshness limit where one applies.</span>
       <span>Orange note: the DLS checkpoint file is older than 7 days or missing, so DLS is not the source of what did arrive.</span>
+      {% if DEPRECATED %}<span>Retired: {{ DEPRECATED|join(', ') }} ({{ m.summary.retired }} checks dropped from the counts; the stream is deprecated in Duo).</span>{% endif %}
     </div>
   </section>
 
@@ -409,7 +410,7 @@
         <div class="kv">
           <span class="k">Restart DLS</span><code>{{ RUNBOOK.dls_restart.replace('{slug}', '<slug>') }}</code>
           <span class="k">Recreate DLS</span><code>{{ RUNBOOK.dls_recreate.replace('{slug}', '<slug>') }}</code>
-          <span class="k">Pull logs</span><code>{{ RUNBOOK.pull_stream.replace('{slug}', '<slug>').replace('{streams}', 'auth | telephony | trust_monitor') }}</code>
+          <span class="k">Pull logs</span><code>{{ RUNBOOK.pull_stream.replace('{slug}', '<slug>').replace('{streams}', 'auth | telephony') }}</code>
           <span class="k">Pull admin</span><code>{{ RUNBOOK.pull_admin.replace('{slug}', '<slug>') }}</code>
           <span class="k">Fix drift</span><code>{{ RUNBOOK.drift_fix.replace('{slug}', '<slug>') }}</code>
         </div>

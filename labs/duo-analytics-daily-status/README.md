@@ -81,6 +81,17 @@ Statuses use the collector's vocabulary (`RED`, `AMBER`, `GREEN`, `INFO`) and
 are mapped to `ERR`, `WARN`, `OK`, `INFO` at render time so the subject line
 and the body finally agree.
 
+## Deprecated streams
+
+`DEPRECATED_STREAMS` in `render.py` lists streams the collector may still
+emit but that must never alert. Trust Monitor is deprecated in Duo, so its
+freshness, ingest, volume and checkpoint checks are dropped from the action
+queue, the matrix, the issue lists and the fleet counts. The dropped checks are
+reported as `retired` in the fleet strip so the totals still reconcile with the
+collector's, and tenant and overall status are recomputed from what remains.
+The collector should stop emitting the stream too; the renderer guard is the
+backstop, not the fix.
+
 ## How the action queue is derived
 
 `derive_actions()` in `render.py`:
