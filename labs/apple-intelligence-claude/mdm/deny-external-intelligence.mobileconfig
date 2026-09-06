@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadType</key>
+			<string>com.apple.applicationaccess</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>PayloadIdentifier</key>
+			<string>com.example.restrictions.external-intelligence.deny</string>
+			<key>PayloadUUID</key>
+			<string>6F0C2A9E-4B7D-4E11-9B7A-2D0E4C1F8A31</string>
+			<key>PayloadDisplayName</key>
+			<string>Apple Intelligence: block external AI providers</string>
+			<key>allowExternalIntelligenceIntegrations</key>
+			<false/>
+			<key>allowExternalIntelligenceIntegrationsSignIn</key>
+			<false/>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Blocks every third-party provider under Apple Intelligence, including OS 27 Extensions (Claude, ChatGPT, Gemini, and others), and blocks provider sign-in from Apple Intelligence settings. Requires a supervised device. Apple's on-device model, Private Cloud Compute, Writing Tools, and Siri remain available.</string>
+	<key>PayloadDisplayName</key>
+	<string>Deny external intelligence integrations</string>
+	<key>PayloadIdentifier</key>
+	<string>com.example.profile.external-intelligence.deny</string>
+	<key>PayloadOrganization</key>
+	<string>Example Organization</string>
+	<key>PayloadRemovalDisallowed</key>
+	<true/>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>A3D51C7B-8E2F-4D06-B4C9-7F1E0A6D2C58</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

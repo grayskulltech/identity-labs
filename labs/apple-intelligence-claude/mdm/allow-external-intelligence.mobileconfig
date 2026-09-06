@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadType</key>
+			<string>com.apple.applicationaccess</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>PayloadIdentifier</key>
+			<string>com.example.restrictions.external-intelligence.allow</string>
+			<key>PayloadUUID</key>
+			<string>C9E7B4D2-1F35-4A8C-8D60-5B2E9F7A3C14</string>
+			<key>PayloadDisplayName</key>
+			<string>Apple Intelligence: permit external AI providers</string>
+			<key>allowExternalIntelligenceIntegrations</key>
+			<true/>
+			<key>allowExternalIntelligenceIntegrationsSignIn</key>
+			<true/>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Explicitly permits third-party providers under Apple Intelligence, including OS 27 Extensions, and permits provider sign-in. Deploy together with an app allowlist that contains only the approved provider app (Claude), because there is no per-provider restriction key. Pair with a recorded AI-use approval.</string>
+	<key>PayloadDisplayName</key>
+	<string>Allow external intelligence integrations</string>
+	<key>PayloadIdentifier</key>
+	<string>com.example.profile.external-intelligence.allow</string>
+	<key>PayloadOrganization</key>
+	<string>Example Organization</string>
+	<key>PayloadRemovalDisallowed</key>
+	<false/>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>E1B8F6A0-2C4D-4F73-A95E-8D3C7B1F0E42</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>
