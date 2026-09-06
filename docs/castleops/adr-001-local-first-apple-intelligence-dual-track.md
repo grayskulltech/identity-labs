@@ -5,7 +5,7 @@ Status: accepted. Supersedes the open decisions in section 7 of the design revie
 ## Decisions
 
 1. **Local-first is a hard requirement.** This is a personal system holding personal data. The authoritative policy decision, tool execution, and audit record live on the Kingsbrook LAN. No cloud service is in the critical path of an action.
-2. **Inference runs on the phone via Apple Intelligence.** Freeform intent extraction uses the on-device Foundation Models framework with guided generation. Siri App Shortcuts cover fixed phrases. No server-side LLM chooses actions.
+2. **Inference runs on the phone via Apple Intelligence.** Freeform intent extraction uses the on-device Foundation Models framework with guided generation. Siri App Shortcuts cover fixed phrases. No server-side LLM chooses actions. Extended to multi-turn conversation in [ADR-002](adr-002-conversational-layer.md).
 3. **Dual track.** The same design ships as a Grayskull product (open-source adapters) and as a Cisco reference architecture (Duo and AI Defense adapters). The two share one published interface contract and nothing else.
 
 ## What local-first means, precisely
