@@ -278,7 +278,7 @@ actor OAuthManager {
 
 ## 7. Build order
 
-1. Decide ownership: Grayskull product (open-source gateway, Keycloak or Authentik, open guardrails) or Cisco lab (Duo Agentic Identity, AI Defense). Do not mix.
+1. Ownership, local-first scope, and inference placement are decided in [ADR-001](adr-001-local-first-apple-intelligence-dual-track.md). Its revised build order supersedes the steps below.
 2. Stand up the gateway with two typed tools and two human principals. No LLM yet. Prove policy denial and audit.
 3. Add DPoP and device posture. Prove a copied token fails off-device.
 4. Add the orchestrator NHI and one worker NHI with token exchange. Prove the worker cannot call outside its scope even when the orchestrator asks.
