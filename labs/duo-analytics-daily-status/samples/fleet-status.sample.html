@@ -1,0 +1,1025 @@
+<title>Duo Analytics Daily Status</title>
+<meta name="color-scheme" content="dark light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* ---- tokens: dark is the designed default; light is the explicit toggle + print ---- */
+  :root {
+    color-scheme: dark;
+    --ground: #0a1220;
+    --surface: #111b2e;
+    --raised: #182540;
+    --hair: #26344f;
+    --hair-strong: #35466a;
+    --ink: #e6edf7;
+    --ink-2: #a5b3c8;
+    --muted: #6d7d96;
+    --accent: #ffd23f;          /* ADA yellow: 12.7:1 on ground */
+    --accent-ink: #ffd23f;
+    --accent-wash: rgba(255, 210, 63, 0.10);
+    --err: #f2545b;
+    --warn: #f08a24;
+    --ok: #27a86c;
+    --info: #4c8dff;
+    --err-wash: rgba(242, 84, 91, 0.14);
+    --warn-wash: rgba(240, 138, 36, 0.14);
+    --ok-wash: rgba(39, 168, 108, 0.14);
+    --info-wash: rgba(76, 141, 255, 0.14);
+    --code-bg: #0c1526;
+    --shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --ground: #f3f5f9;
+    --surface: #ffffff;
+    --raised: #f7f9fc;
+    --hair: #dfe5ee;
+    --hair-strong: #c5cfdd;
+    --ink: #0f1a2b;
+    --ink-2: #3f4d63;
+    --muted: #6b7890;
+    --accent: #ffd23f;
+    --accent-ink: #6f5300;
+    --accent-wash: rgba(255, 210, 63, 0.28);
+    --err: #c62f36;
+    --warn: #b85f06;
+    --ok: #1a7f4f;
+    --info: #2160c4;
+    --err-wash: rgba(198, 47, 54, 0.10);
+    --warn-wash: rgba(184, 95, 6, 0.10);
+    --ok-wash: rgba(26, 127, 79, 0.10);
+    --info-wash: rgba(33, 96, 196, 0.10);
+    --code-bg: #eef2f8;
+    --shadow: none;
+  }
+  @media print {
+    :root {
+      color-scheme: light;
+      --ground: #ffffff; --surface: #ffffff; --raised: #f7f9fc; --hair: #d5dce7; --hair-strong: #b8c2d2;
+      --ink: #0f1a2b; --ink-2: #3f4d63; --muted: #6b7890;
+      --accent: #ffd23f; --accent-ink: #6f5300; --accent-wash: rgba(255,210,63,0.28);
+      --err: #c62f36; --warn: #b85f06; --ok: #1a7f4f; --info: #2160c4;
+      --err-wash: rgba(198,47,54,0.10); --warn-wash: rgba(184,95,6,0.10); --ok-wash: rgba(26,127,79,0.10); --info-wash: rgba(33,96,196,0.10);
+      --code-bg: #f1f4f9; --shadow: none;
+    }
+    details { break-inside: avoid; }
+    details > * { display: block; }
+    .toolbar { display: none; }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  a { color: var(--accent-ink); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .page { max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; display: grid; gap: 40px; }
+  @media (max-width: 640px) { .page { padding: 20px 14px 48px; gap: 28px; } }
+
+  /* ---- masthead ---- */
+  .mast { display: grid; gap: 18px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
+  h1 { margin: 0; font-size: 30px; line-height: 1.15; font-weight: 600; text-wrap: balance; }
+  .mast-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 32px; }
+  .meta { color: var(--ink-2); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .meta .mono { color: var(--muted); }
+
+  .overall {
+    display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 6px;
+    font-weight: 600; letter-spacing: .04em; font-size: 14px; text-transform: uppercase;
+  }
+  .overall.RED { background: var(--err-wash); color: var(--err); box-shadow: inset 0 0 0 1px var(--err); }
+  .overall.AMBER { background: var(--warn-wash); color: var(--warn); box-shadow: inset 0 0 0 1px var(--warn); }
+  .overall.GREEN { background: var(--ok-wash); color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+
+  /* ---- fleet strip ---- */
+  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--hair); border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; }
+  .tile { background: var(--surface); padding: 16px 18px; display: grid; gap: 6px; align-content: start; }
+  .tile .label { font-size: 12px; color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
+  .tile .value { font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .tile .sub { font-size: 13px; color: var(--muted); }
+  .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--ground); margin-top: 6px; }
+  .bar span { display: block; height: 100%; }
+  .bar .ok { background: var(--ok); } .bar .warn { background: var(--warn); } .bar .err { background: var(--err); }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
+  .legend b { font-weight: 600; color: var(--ink); }
+
+  /* ---- sections ---- */
+  section { display: grid; gap: 16px; }
+  h2 { margin: 0; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; display: flex; align-items: baseline; gap: 12px; }
+  h2 small { color: var(--muted); letter-spacing: 0; text-transform: none; font-weight: 400; font-size: 13px; }
+  h3 { margin: 0; font-size: 16px; font-weight: 600; }
+  .lede { color: var(--ink-2); max-width: 68ch; margin: 0; }
+
+  /* ---- status chip: color + glyph + word, never color alone ---- */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px;
+    font-size: 11.5px; font-weight: 600; letter-spacing: .06em; white-space: nowrap; line-height: 1.5;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  .chip .g { font-size: 9px; }
+  .chip.RED { background: var(--err-wash); color: var(--err); }
+  .chip.AMBER { background: var(--warn-wash); color: var(--warn); }
+  .chip.GREEN { background: var(--ok-wash); color: var(--ok); }
+  .chip.INFO { background: var(--info-wash); color: var(--info); }
+
+  /* ---- action queue ---- */
+  .queue { display: grid; gap: 12px; counter-reset: act; }
+  .act {
+    display: grid; grid-template-columns: 44px 1fr; gap: 0 16px; background: var(--surface);
+    border: 1px solid var(--hair); border-left: 3px solid var(--hair-strong); border-radius: 6px; padding: 16px 18px 16px 14px;
+  }
+  .act.RED { border-left-color: var(--err); } .act.AMBER { border-left-color: var(--warn); } .act.INFO { border-left-color: var(--info); }
+  .act .n { font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 500; color: var(--accent-ink); line-height: 1.1; }
+  .act .body { display: grid; gap: 8px; min-width: 0; }
+  .act .head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .act .why { color: var(--ink-2); margin: 0; max-width: 78ch; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-2); background: var(--raised); border: 1px solid var(--hair); border-radius: 4px; padding: 1px 7px; }
+  pre.cmd {
+    margin: 4px 0 0; background: var(--code-bg); border: 1px solid var(--hair); border-radius: 6px; padding: 10px 12px;
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px; line-height: 1.6; color: var(--ink); overflow-x: auto; white-space: pre;
+  }
+  pre.cmd .c { color: var(--muted); }
+
+  /* ---- stream matrix ---- */
+  .scroll { overflow-x: auto; border: 1px solid var(--hair); border-radius: 8px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  th { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; background: var(--raised); white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tr.group td { background: var(--raised); color: var(--muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 6px 12px; }
+  td.tenant { min-width: 190px; }
+  td.tenant .name { font-weight: 600; }
+  td.tenant .slug { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); }
+  td.cell { min-width: 150px; }
+  .cell .s, .cell .cp { white-space: nowrap; }
+  .cell .v { display: flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 500; }
+  .cell .v .g { font-size: 10px; }
+  .cell .v.RED { color: var(--err); } .cell .v.AMBER { color: var(--warn); } .cell .v.GREEN { color: var(--ok); } .cell .v.INFO { color: var(--info); }
+  .cell .s { font-size: 12px; color: var(--muted); }
+  .cell .cp { font-size: 12px; color: var(--warn); }
+  .matrix-legend { font-size: 12.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .matrix-legend .mono { color: var(--ink); }
+
+  /* ---- tenant detail ---- */
+  .toolbar { display: flex; gap: 8px; justify-content: flex-end; }
+  button.ghost { background: transparent; color: var(--ink-2); border: 1px solid var(--hair-strong); border-radius: 4px; padding: 5px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  button.ghost:hover { color: var(--ink); border-color: var(--accent); }
+  details.tenant { background: var(--surface); border: 1px solid var(--hair); border-radius: 8px; }
+  details.tenant + details.tenant { margin-top: 10px; }
+  details.tenant > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr auto; gap: 8px 16px; align-items: center; }
+  details.tenant > summary::-webkit-details-marker { display: none; }
+  details.tenant > summary .who { display: grid; gap: 2px; min-width: 0; }
+  details.tenant > summary .who .name { font-weight: 600; }
+  details.tenant > summary .who .headline { font-size: 13px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  details.tenant > summary .counts { display: flex; gap: 6px; }
+  details.tenant > summary .caret { color: var(--muted); font-size: 12px; transition: transform .15s; }
+  details.tenant[open] > summary .caret { transform: rotate(90deg); }
+  @media (max-width: 640px) { details.tenant > summary { grid-template-columns: auto 1fr; } details.tenant > summary .counts { grid-column: 1 / -1; } }
+  .tbody { border-top: 1px solid var(--hair); padding: 16px 18px 18px; display: grid; gap: 20px; }
+  .issues { display: grid; gap: 0; border: 1px solid var(--hair); border-radius: 6px; overflow: hidden; }
+  .issue { display: grid; grid-template-columns: 78px 200px 1fr; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--hair); align-items: baseline; font-size: 13.5px; }
+  .issue:last-child { border-bottom: 0; }
+  .issue .check { font-weight: 500; }
+  .issue .text { color: var(--ink-2); }
+  @media (max-width: 640px) { .issue { grid-template-columns: 78px 1fr; } .issue .text { grid-column: 2; } }
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px 16px; }
+  .fact { display: grid; gap: 2px; }
+  .fact .k { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fact .v { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
+  .fact .v small { color: var(--muted); font-size: 12px; }
+  .okline { font-size: 12.5px; color: var(--muted); }
+  .okline b { color: var(--ink-2); font-weight: 500; }
+  .frameworks { font-size: 12.5px; color: var(--muted); }
+
+  /* ---- fleet facts ---- */
+  .facts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--hair); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; align-content: start; }
+  .card h3 { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13.5px; align-items: baseline; }
+  .kv .k { color: var(--muted); }
+  .containers { display: grid; gap: 6px; font-size: 13px; }
+  .containers .row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+  .containers .row .mono { color: var(--ink-2); font-size: 12.5px; }
+
+  footer { color: var(--muted); font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; border-top: 1px solid var(--hair); padding-top: 16px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+
+
+<div class="page">
+
+  <header class="mast">
+    <div class="eyebrow">Duo Analytics · Daily Status</div>
+    <div class="mast-row">
+      <h1>Sunday 6 September 2026</h1>
+      <div class="overall RED"><span aria-hidden="true">■</span> Fleet ERR</div>
+    </div>
+    <div class="meta">
+      <span>Run 11:00 UTC</span>
+      <span>Collected in 9m 14s, 0 collector errors</span>
+      <span>Host <span class="mono">REPORT-HOST</span></span>
+      <span class="mono">20260906T110000Z-sample</span>
+    </div>
+    <div class="strip">
+      <div class="tile">
+        <div class="label">Tenants</div>
+        <div class="value">8</div>
+        <div class="sub">8 err · 0 warn · 0 ok</div>
+      </div>
+      <div class="tile">
+        <div class="label">Checks</div>
+        <div class="value">195</div>
+        <div class="bar" role="img" aria-label="110 ok, 61 warn, 24 err">
+          <span class="ok" style="flex: 110"></span><span class="warn" style="flex: 61"></span><span class="err" style="flex: 24"></span>
+        </div>
+        <div class="legend"><span><b>110</b> ok</span><span><b>61</b> warn</span><span><b>24</b> err</span></div>
+      </div>
+      <div class="tile">
+        <div class="label">Actions today</div>
+        <div class="value">9</div>
+        <div class="sub">2 more to note, no action</div>
+      </div>
+      <div class="tile">
+        <div class="label">Duo service</div>
+        <div class="value" style="font-size: 20px; padding-top: 4px;"><span class="chip GREEN"><span class="g" aria-hidden="true">●</span>OK</span></div>
+        <div class="sub">no active or recent (24h) incidents on status.duo.com · 1 release in 7d (2026-09-03)</div>
+      </div>
+    </div>
+  </header>
+
+  <section id="today">
+    <h2>Do today <small>ordered by impact, one runbook each</small></h2>
+    <div class="queue">
+      <article class="act RED">
+        <div class="n">01</div>
+        <div class="body">
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer A: Telephony, Admin, Trust Monitor stalled</h3></div>
+          <p class="why">Telephony, Admin, Trust Monitor stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d, Trust Monitor 249d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
+          <div class="tags"><span class="tag">tenant-a</span></div>
+          <pre class="cmd">docker restart tenant-a-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-a-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=tenant-a &amp;&amp; python pull.py --logs-only   # streams: telephony, trust_monitor
+python pull_activity.py --tenant tenant-a</pre>
+        </div>
+      </article>
+      <article class="act RED">
+        <div class="n">02</div>
+        <div class="body">
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer B: Telephony, Trust Monitor stalled</h3></div>
+          <p class="why">Telephony, Trust Monitor stopped arriving while auth is still flowing, so the container is alive but these streams are dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
+          <div class="tags"><span class="tag">tenant-b</span></div>
+          <pre class="cmd">docker restart tenant-b-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-b-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=tenant-b &amp;&amp; python pull.py --logs-only   # streams: telephony, trust_monitor</pre>
+        </div>
+      </article>
+      <article class="act RED">
+        <div class="n">03</div>
+        <div class="body">
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer C: Admin, Trust Monitor stalled</h3></div>
+          <p class="why">Admin, Trust Monitor stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
+          <div class="tags"><span class="tag">tenant-c</span></div>
+          <pre class="cmd">docker restart tenant-c-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-c-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=tenant-c &amp;&amp; python pull.py --logs-only   # streams: trust_monitor
+python pull_activity.py --tenant tenant-c</pre>
+        </div>
+      </article>
+      <article class="act RED">
+        <div class="n">04</div>
+        <div class="body">
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer D: Trust Monitor stalled</h3></div>
+          <p class="why">Trust Monitor stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Trust Monitor 231d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
+          <div class="tags"><span class="tag">tenant-d</span></div>
+          <pre class="cmd">docker restart tenant-d-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-d-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=tenant-d &amp;&amp; python pull.py --logs-only   # streams: trust_monitor</pre>
+        </div>
+      </article>
+      <article class="act RED">
+        <div class="n">05</div>
+        <div class="body">
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant B (Advantage): Auth, Telephony, Admin, Trust Monitor not flowing</h3></div>
+          <p class="why">Auth, Telephony, Trust Monitor never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.</p>
+          <div class="tags"><span class="tag">lab-b</span></div>
+          <pre class="cmd"><span class="c"># first: unblock the merge</span>
+python schema_drift.py --tenant lab-b --apply
+docker restart lab-b-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-b-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=lab-b &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor
+python pull_activity.py --tenant lab-b</pre>
+        </div>
+      </article>
+      <article class="act RED">
+        <div class="n">06</div>
+        <div class="body">
+          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant C (Essentials): Auth, Telephony, Admin, Trust Monitor not flowing</h3></div>
+          <p class="why">Auth, Telephony, Trust Monitor never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.</p>
+          <div class="tags"><span class="tag">lab-c</span></div>
+          <pre class="cmd"><span class="c"># first: unblock the merge</span>
+python schema_drift.py --tenant lab-c --apply
+docker restart lab-c-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-c-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=lab-c &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor
+python pull_activity.py --tenant lab-c</pre>
+        </div>
+      </article>
+      <article class="act AMBER">
+        <div class="n">07</div>
+        <div class="body">
+          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Customer E (Non-Production): Auth, Telephony, Admin, Trust Monitor not flowing</h3></div>
+          <p class="why">Trust Monitor never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for this stream. Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
+          <div class="tags"><span class="tag">tenant-e</span></div>
+          <pre class="cmd">docker restart tenant-e-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=tenant-e &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor
+python pull_activity.py --tenant tenant-e</pre>
+        </div>
+      </article>
+      <article class="act AMBER">
+        <div class="n">08</div>
+        <div class="body">
+          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>API pull has not completed in over 24h for 3 tenants</h3></div>
+          <p class="why">The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report&#39;s scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.</p>
+          <div class="tags"><span class="tag">tenant-c</span><span class="tag">lab-a</span><span class="tag">lab-b</span></div>
+          <pre class="cmd"><span class="c"># on the report host</span>
+schtasks /Query /FO LIST /V | findstr /I &#34;Duo-Analytics&#34;
+nssm status Duo-Analytics</pre>
+        </div>
+      </article>
+      <article class="act AMBER">
+        <div class="n">09</div>
+        <div class="body">
+          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Lab Tenant A (Premier): Auth, Telephony, Trust Monitor stalled</h3></div>
+          <p class="why">Auth, Telephony, Trust Monitor stopped arriving. DLS checkpoints are old (Telephony 51d, Trust Monitor 85d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
+          <div class="tags"><span class="tag">lab-a</span></div>
+          <pre class="cmd">docker restart lab-a-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-a-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: auth, telephony, trust_monitor</pre>
+        </div>
+      </article>
+      <article class="act INFO">
+        <div class="n">10</div>
+        <div class="body">
+          <div class="head"><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span><h3>3 containers restarted just before this run</h3></div>
+          <p class="why">tenant-a-duologsync up 52 seconds, lab-c-duologsync up about a minute, tenant-d-duologsync up about a minute. Health is still &#39;starting&#39;, so today&#39;s freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.</p>
+          <div class="tags"><span class="tag">tenant-a</span><span class="tag">lab-c</span><span class="tag">tenant-d</span></div>
+        </div>
+      </article>
+      <article class="act INFO">
+        <div class="n">11</div>
+        <div class="body">
+          <div class="head"><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span><h3>SLO history exists for only 1 of 8 tenants</h3></div>
+          <p class="why">Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.</p>
+          <div class="tags"><span class="tag">tenant-b</span><span class="tag">tenant-c</span><span class="tag">lab-a</span><span class="tag">lab-b</span><span class="tag">lab-c</span><span class="tag">tenant-d</span><span class="tag">tenant-e</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="streams">
+    <h2>Streams <small>age of the newest row per stream, worst of freshness and 24h ingest</small></h2>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Tenant</th>
+<th>Auth</th><th>Telephony</th><th>Admin</th><th>Trust Monitor</th>            <th>API pull</th>
+            <th>Staging</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group"><td colspan="7">Customer tenants</td></tr>
+          <tr>
+            <td class="tenant"><div class="name">Customer A</div><div class="slug">tenant-a · Duo Advantage</div></td>
+<td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>12m<span class="sr" hidden>OK</span></div>
+<div class="s">11.9K rows/24h</div></td><td class="cell">
+  <div class="v RED"><span class="g" aria-hidden="true">■</span>24.8h<span class="sr" hidden>ERR</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 4h</div><div class="cp">checkpoint 142d old</div></td><td class="cell">
+  <div class="v RED"><span class="g" aria-hidden="true">■</span>35.1h<span class="sr" hidden>ERR</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 109d old</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>41.6h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 249d old</div></td>            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>54m<span class="sr" hidden>OK</span></div>
+<div class="s">+0 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
+</td>
+          </tr>
+          <tr>
+            <td class="tenant"><div class="name">Customer B</div><div class="slug">tenant-b · Duo Advantage</div></td>
+<td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.4h<span class="sr" hidden>OK</span></div>
+<div class="s">99 rows/24h</div></td><td class="cell">
+  <div class="v RED"><span class="g" aria-hidden="true">■</span>13.8h<span class="sr" hidden>ERR</span></div>
+<div class="s">26 rows/24h</div><div class="s">limit 4h</div></td><td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>10.4h<span class="sr" hidden>OK</span></div>
+<div class="s">7 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>3d<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 24h</div></td>            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>4h<span class="sr" hidden>OK</span></div>
+<div class="s">+0 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
+</td>
+          </tr>
+          <tr>
+            <td class="tenant"><div class="name">Customer C</div><div class="slug">tenant-c · Duo Advantage</div></td>
+<td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>6m<span class="sr" hidden>OK</span></div>
+<div class="s">1.2K rows/24h</div></td><td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>3.6h<span class="sr" hidden>OK</span></div>
+<div class="s">30 rows/24h</div></td><td class="cell">
+  <div class="v RED"><span class="g" aria-hidden="true">■</span>2d<span class="sr" hidden>ERR</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 116d old</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>41.2h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td>            <td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>26.9h<span class="sr" hidden>WARN</span></div>
+<div class="s">+1 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
+</td>
+          </tr>
+          <tr>
+            <td class="tenant"><div class="name">Customer D</div><div class="slug">tenant-d · Duo Premier</div></td>
+<td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.1h<span class="sr" hidden>OK</span></div>
+<div class="s">27.5K rows/24h</div></td><td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.1h<span class="sr" hidden>OK</span></div>
+<div class="s">221 rows/24h</div></td><td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.1h<span class="sr" hidden>OK</span></div>
+<div class="s">262 rows/24h</div><div class="cp">checkpoint 138d old</div></td><td class="cell">
+  <div class="v RED"><span class="g" aria-hidden="true">■</span>37.9h<span class="sr" hidden>ERR</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 231d old</div></td>            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1h<span class="sr" hidden>OK</span></div>
+<div class="s">+9.5K auth / +110 tel</div></td>
+            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
+</td>
+          </tr>
+          <tr>
+            <td class="tenant"><div class="name">Customer E (Non-Production)</div><div class="slug">tenant-e · Duo Premier</div></td>
+<td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>38.8h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>2d<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>44.2h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
+<div class="s">never received</div><div class="cp">checkpoint missing</div></td>            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.4h<span class="sr" hidden>OK</span></div>
+<div class="s">+1 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
+</td>
+          </tr>
+          <tr class="group"><td colspan="7">Lab tenants</td></tr>
+          <tr>
+            <td class="tenant"><div class="name">Lab Tenant A (Premier)</div><div class="slug">lab-a · Duo Premier</div></td>
+<td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>35.8h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>51d<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 7d</div><div class="cp">checkpoint 51d old</div></td><td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>36m<span class="sr" hidden>OK</span></div>
+<div class="s">94 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>85d<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div><div class="s">limit 7d</div><div class="cp">checkpoint 85d old</div></td>            <td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>27.5h<span class="sr" hidden>WARN</span></div>
+<div class="s">+1 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
+</td>
+          </tr>
+          <tr>
+            <td class="tenant"><div class="name">Lab Tenant B (Advantage)</div><div class="slug">lab-b · Duo Advantage</div></td>
+<td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
+<div class="s">never received</div><div class="cp">checkpoint missing</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
+<div class="s">never received</div><div class="cp">checkpoint missing</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>44h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
+<div class="s">never received</div><div class="cp">checkpoint missing</div></td>            <td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>27h<span class="sr" hidden>WARN</span></div>
+<div class="s">+0 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v RED"><span class="g" aria-hidden="true">■</span>1.7K stuck<span class="sr" hidden>ERR</span></div>
+<div class="s">5 tables</div></td>
+          </tr>
+          <tr>
+            <td class="tenant"><div class="name">Lab Tenant C (Essentials)</div><div class="slug">lab-c · Duo Essentials</div></td>
+<td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
+<div class="s">never received</div><div class="cp">checkpoint missing</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
+<div class="s">never received</div><div class="cp">checkpoint missing</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>2d<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div><div class="cp">checkpoint 27d old</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>no data<span class="sr" hidden>WARN</span></div>
+<div class="s">never received</div><div class="cp">checkpoint missing</div></td>            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.9h<span class="sr" hidden>OK</span></div>
+<div class="s">+0 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v RED"><span class="g" aria-hidden="true">■</span>16 stuck<span class="sr" hidden>ERR</span></div>
+<div class="s">5 tables</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="matrix-legend">
+      <span><span class="mono">■</span> err</span>
+      <span><span class="mono">▲</span> warn</span>
+      <span><span class="mono">●</span> ok</span>
+      <span>Second line: rows landed in the last 24h and the freshness limit where one applies.</span>
+      <span>Orange note: the DLS checkpoint file is older than 7 days or missing, so DLS is not the source of what did arrive.</span>
+    </div>
+  </section>
+
+  <section id="tenants">
+    <h2>Tenant detail <small>exceptions only; healthy checks are counted, not listed</small></h2>
+    <div class="toolbar">
+      <button class="ghost" type="button" data-toggle="open">Expand all</button>
+      <button class="ghost" type="button" data-toggle="close">Collapse all</button>
+    </div>
+    <div>
+    <details class="tenant" id="t-tenant-a">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Customer A <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">tenant-a · ACCT01 · Duo Advantage</span></div>
+          <div class="headline">Telephony freshness last row 2026-09-05 10:15 UTC (24.8h ago, limit 4h); Telephony ingest 0 rows in 24h (8.1M lifetime)</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">10 err</span><span class="chip AMBER">6 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Telephony freshness</div><div class="text">last row 2026-09-05 10:15 UTC (24.8h ago, limit 4h)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Telephony ingest</div><div class="text">0 rows in 24h (8.1M lifetime)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Telephony checkpoint</div><div class="text">DLS checkpoint 2026-04-17 12:53 UTC (142d old)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin freshness</div><div class="text">last row 2026-09-04 23:54 UTC (35.1h ago, limit 24h)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (944.9K lifetime)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-05-19 23:29 UTC (109d old)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Gaps (30d)</div><div class="text">12 days with no data. Includes 2026-08-15, 2026-08-16, 2026-08-17, 2026-08-18, 2026-08-19</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">SLO auth freshness</div><div class="text">63.6% over 33 daily samples</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">SLO telephony freshness</div><div class="text">54.5% over 33 daily samples (2026-08-07 to 2026-09-05)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">SLO ingest volume</div><div class="text">63.6% over 33 daily samples (2026-08-07 to 2026-09-05)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony volume</div><div class="text">yesterday 505 vs same-weekday median 1,542</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 972</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-09-04 17:25 UTC (41.6h ago, limit 24h)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (3.8K lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2025-12-31 03:21 UTC (249d old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">5 ERROR lines in the last 200 log lines</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">77,900</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">83,500 <small>users</small> · 518 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">3 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">0 <small>credits · 0 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">9M</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">179.4 GB <small>WAL 132 MB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">12 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">284</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-04 10:32</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v">63.6% <small>/ 33 samples</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v">54.5% <small>/ 33 samples</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v">63.6% <small>/ 33 samples</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> auth stream, staging parity, API pull, telephony spend, bypass codes.
+          Change log: n/a 3, proposed 17. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: HIPAA, HITECH, HITRUST_CSF</div>
+      </div>
+    </details>
+    <details class="tenant" id="t-tenant-b">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Customer B <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">tenant-b · ACCT02 · Duo Advantage</span></div>
+          <div class="headline">Telephony freshness last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h); Trust Monitor freshness last row 2026-09-03 16:04 UTC (3d ago, limit 24h)</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">1 err</span><span class="chip AMBER">3 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Telephony freshness</div><div class="text">last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-09-03 16:04 UTC (3d ago, limit 24h)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (63 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-09-03 16:04 UTC (3d old)</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">600</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">600 <small>users</small> · 23 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">7</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">0 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">48 <small>credits · 26 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">1.4M</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">828 MB <small>WAL 0 KB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">0 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">796</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-05 07:00</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v"><small>warming up · target 99.5%</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> auth stream, admin stream, staging parity, API pull, container log, telephony spend, bypass codes, no data gaps.
+          Change log: proposed 15. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: HIPAA, HITECH, HITRUST_CSF</div>
+      </div>
+    </details>
+    <details class="tenant" id="t-tenant-c">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Customer C <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">tenant-c · ACCT03 · Duo Advantage</span></div>
+          <div class="headline">Admin freshness last row 2026-09-04 07:43 UTC (2d ago, limit 24h); Admin ingest 0 rows in 24h (5.9M lifetime)</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">3 err</span><span class="chip AMBER">4 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin freshness</div><div class="text">last row 2026-09-04 07:43 UTC (2d ago, limit 24h)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (5.9M lifetime)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-05-13 16:08 UTC (116d old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 631</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (458 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-09-04 17:45 UTC (41.2h old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">API pull</div><div class="text">last completed 2026-09-05 08:07 UTC (26.9h ago)</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">2,300</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">2,200 <small>users</small> · 26 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">0 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">60 <small>credits · 30 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">183.9K</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">38.5 GB <small>WAL 1 MB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">0 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-05 08:08</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v"><small>warming up · target 99.5%</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> auth stream, telephony stream, staging parity, container log, telephony spend, bypass codes, no data gaps.
+          Change log: n/a 2, proposed 16. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: HIPAA, HITECH, HITRUST_CSF</div>
+      </div>
+    </details>
+    <details class="tenant" id="t-lab-a">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Lab Tenant A (Premier) <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">lab-a · ACCT04 · Duo Premier</span></div>
+          <div class="headline">Gaps (30d) 22 days with no data. Includes 2026-08-27, 2026-08-28, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (1.3K lifetime)</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">1 err</span><span class="chip AMBER">9 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Gaps (30d)</div><div class="text">22 days with no data. Includes 2026-08-27, 2026-08-28, 2026-08-29, 2026-08-30, 2026-09-05</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth ingest</div><div class="text">0 rows in 24h (1.3K lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth checkpoint</div><div class="text">DLS checkpoint 2026-09-04 23:11 UTC (35.8h old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony freshness</div><div class="text">last row 2026-07-17 01:26 UTC (51d ago, limit 7d)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony ingest</div><div class="text">0 rows in 24h (14 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony checkpoint</div><div class="text">DLS checkpoint 2026-07-17 01:26 UTC (51d old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-06-13 13:20 UTC (85d ago, limit 7d)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (1 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-06-13 13:20 UTC (85d old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">API pull</div><div class="text">last completed 2026-09-05 07:30 UTC (27.5h ago)</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">0 <small>users</small> · 0 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">94</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">0 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">0 <small>credits · 0 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">1.9K</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">762 MB <small>WAL 0 KB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">22 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-05 07:30</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v"><small>warming up · target 99.5%</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> admin stream, staging parity, container log, telephony spend, bypass codes.
+          Change log: n/a 5, proposed 12. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: SOC2, CIS_Controls_v8</div>
+      </div>
+    </details>
+    <details class="tenant" id="t-lab-b">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Lab Tenant B (Advantage) <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">lab-b · ACCT05 · Duo Advantage</span></div>
+          <div class="headline">Schema drift 5 tables missing merge columns, 1,726 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">2 err</span><span class="chip AMBER">13 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Schema drift</div><div class="text">5 tables missing merge columns, 1,726 rows stuck in staging</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Gaps (30d)</div><div class="text">30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth freshness</div><div class="text">no rows ever received</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth checkpoint</div><div class="text">checkpoint file missing in container</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony freshness</div><div class="text">no rows ever received</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony checkpoint</div><div class="text">checkpoint file missing in container</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (1.1K lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-09-04 15:02 UTC (44h old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">no rows ever received</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">checkpoint file missing in container</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">API pull</div><div class="text">last completed 2026-09-05 08:00 UTC (27h ago)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">1 ERROR lines in the last 200 log lines</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">0 <small>users</small> · 1 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">0 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">0 <small>credits · 0 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">457</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">12 MB <small>WAL 0 KB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">30 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-05 08:00</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v"><small>warming up · target 99.5%</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> telephony spend, bypass codes.
+          Change log: proposed 3. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: SOC2, CIS_Controls_v8</div>
+      </div>
+    </details>
+    <details class="tenant" id="t-lab-c">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Lab Tenant C (Essentials) <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">lab-c · ACCT06 · Duo Essentials</span></div>
+          <div class="headline">Schema drift 5 tables missing merge columns, 16 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">2 err</span><span class="chip AMBER">13 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Schema drift</div><div class="text">5 tables missing merge columns, 16 rows stuck in staging</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Gaps (30d)</div><div class="text">30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth freshness</div><div class="text">no rows ever received</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth checkpoint</div><div class="text">checkpoint file missing in container</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony freshness</div><div class="text">no rows ever received</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony checkpoint</div><div class="text">checkpoint file missing in container</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (41.4K lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 631</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-08-10 14:14 UTC (27d old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">no rows ever received</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">checkpoint file missing in container</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">5 ERROR lines in the last 200 log lines</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">0 <small>users</small> · 0 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">0 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">0 <small>credits · 0 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">2K</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">205 MB <small>WAL 0 KB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">30 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">215</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-06 09:07</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v"><small>warming up · target 99.5%</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> API pull, telephony spend, bypass codes.
+          Change log: proposed 3. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: SOC2, CIS_Controls_v8</div>
+      </div>
+    </details>
+    <details class="tenant" id="t-tenant-d">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Customer D <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">tenant-d · ACCT07 · Duo Premier</span></div>
+          <div class="headline">Admin checkpoint DLS checkpoint 2026-04-21 22:39 UTC (138d old); Trust Monitor freshness last row 2026-09-04 21:08 UTC (37.9h ago, limit 24h)</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">4 err</span><span class="chip AMBER">2 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-04-21 22:39 UTC (138d old)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Trust Monitor freshness</div><div class="text">last row 2026-09-04 21:08 UTC (37.9h ago, limit 24h)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (1.9K lifetime)</div></div>
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Trust Monitor checkpoint</div><div class="text">DLS checkpoint 2026-01-17 23:09 UTC (231d old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">5 ERROR lines in the last 200 log lines</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony credits</div><div class="text">278 credits across 221 transactions in 24h</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">85,400</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">76,400 <small>users</small> · 62 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">262</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">0 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">278 <small>credits · 221 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">13.4M</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">116.3 GB <small>WAL 0 KB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">0 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">895</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-05 10:15</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v"><small>warming up · target 99.5%</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> auth stream, telephony stream, admin stream, staging parity, API pull, bypass codes, no data gaps.
+          Change log: proposed 17. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: HIPAA, HITRUST_CSF, NIST_CSF_2.0</div>
+      </div>
+    </details>
+    <details class="tenant" id="t-tenant-e">
+      <summary>
+        <span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span>
+        <div class="who">
+          <div class="name">Customer E (Non-Production) <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">tenant-e · ACCT08 · Duo Premier</span></div>
+          <div class="headline">Gaps (30d) 9 days with no data. Includes 2026-08-22, 2026-08-23, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (2.5K lifetime)</div>
+        </div>
+        <div class="counts">
+<span class="chip RED">1 err</span><span class="chip AMBER">11 warn</span>          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        <div class="issues">
+          <div class="issue"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><div class="check">Gaps (30d)</div><div class="text">9 days with no data. Includes 2026-08-22, 2026-08-23, 2026-08-29, 2026-08-30, 2026-09-05</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth ingest</div><div class="text">0 rows in 24h (2.5K lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Auth checkpoint</div><div class="text">DLS checkpoint 2026-09-04 20:12 UTC (38.8h old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony ingest</div><div class="text">0 rows in 24h (99 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Telephony checkpoint</div><div class="text">DLS checkpoint 2026-09-04 10:04 UTC (2d old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin ingest</div><div class="text">0 rows in 24h (147.9K lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin volume</div><div class="text">yesterday 0 vs same-weekday median 632</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Admin checkpoint</div><div class="text">DLS checkpoint 2026-09-04 14:50 UTC (44.2h old)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor freshness</div><div class="text">no rows ever received</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor ingest</div><div class="text">0 rows in 24h (0 lifetime)</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Trust Monitor checkpoint</div><div class="text">checkpoint file missing in container</div></div>
+          <div class="issue"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><div class="check">Container log</div><div class="text">1 ERROR lines in the last 200 log lines</div></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">43,500</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">53,500 <small>users</small> · 8 <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">0</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">0 <small>of 5</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">0 <small>credits · 0 txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">97.7K</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">852 MB <small>WAL 0 KB</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">9 <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">748</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">2026-09-06 09:38</div></div>
+          <div class="fact"><div class="k">SLO auth freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO telephony freshness</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+          <div class="fact"><div class="k">SLO ingest volume</div>
+            <div class="v"><small>warming up · target 99.5%</small></div></div>
+          <div class="fact"><div class="k">SLO container health</div>
+            <div class="v"><small>warming up · target 99.0%</small></div></div>
+        </div>
+        <div class="okline"><b>Healthy:</b> staging parity, API pull, telephony spend, bypass codes.
+          Change log: n/a 1, proposed 18. No deploys to main in 24h.</div>
+        <div class="frameworks">Frameworks in scope: HIPAA, HITRUST_CSF, NIST_CSF_2.0</div>
+      </div>
+    </details>
+    </div>
+  </section>
+
+  <section id="fleet">
+    <h2>Report host <small>REPORT-HOST</small></h2>
+    <div class="facts-grid">
+      <div class="card">
+        <h3>DLS containers</h3>
+        <div class="containers">
+          <div class="row"><span class="mono">tenant-a-duologsync</span><span class="mono">up 52 seconds</span><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span></div>
+          <div class="row"><span class="mono">tenant-b-duologsync</span><span class="mono">up 4 hours</span><span class="chip GREEN"><span class="g" aria-hidden="true">●</span>OK</span></div>
+          <div class="row"><span class="mono">tenant-c-duologsync</span><span class="mono">up 4 hours</span><span class="chip GREEN"><span class="g" aria-hidden="true">●</span>OK</span></div>
+          <div class="row"><span class="mono">lab-a-duologsync</span><span class="mono">up 4 hours</span><span class="chip GREEN"><span class="g" aria-hidden="true">●</span>OK</span></div>
+          <div class="row"><span class="mono">lab-b-duologsync</span><span class="mono">up 59 minutes</span><span class="chip GREEN"><span class="g" aria-hidden="true">●</span>OK</span></div>
+          <div class="row"><span class="mono">lab-c-duologsync</span><span class="mono">up about a minute</span><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span></div>
+          <div class="row"><span class="mono">tenant-d-duologsync</span><span class="mono">up about a minute</span><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span></div>
+          <div class="row"><span class="mono">tenant-e-duologsync</span><span class="mono">up 59 minutes</span><span class="chip GREEN"><span class="g" aria-hidden="true">●</span>OK</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Host</h3>
+        <div class="kv">
+          <span class="k">Disk C:</span><span>471.3 GB free of 951.6 GB (49.5%)</span>
+          <span class="k">Scheduler</span><span><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span> collector found 0 scheduled tasks. Zero tasks is not a pass, it is a blind spot.</span>
+<span class="k">Service</span><span><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span> nssm not on PATH</span>          <span class="k">Deploys</span><span>no commits to main in 24h</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Runbook</h3>
+        <div class="kv">
+          <span class="k">Restart DLS</span><code>docker restart &lt;slug&gt;-duologsync</code>
+          <span class="k">Recreate DLS</span><code>docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps &lt;slug&gt;-dls</code>
+          <span class="k">Pull logs</span><code>set DUO_TENANT_SLUG=&lt;slug&gt; &amp;&amp; python pull.py --logs-only   # streams: auth | telephony | trust_monitor</code>
+          <span class="k">Pull admin</span><code>python pull_activity.py --tenant &lt;slug&gt;</code>
+          <span class="k">Fix drift</span><code>python schema_drift.py --tenant &lt;slug&gt; --apply</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Duo Analytics · 2026-09-06 11:00 UTC</span>
+    <span class="mono">20260906T110000Z-sample</span>
+<span>Confidential</span>  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('[data-toggle]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('data-toggle') === 'open';
+      document.querySelectorAll('details.tenant').forEach(function (d) { d.open = open; });
+    });
+  });
+  if (location.hash) { var el = document.querySelector(location.hash); if (el && el.tagName === 'DETAILS') el.open = true; }
+</script>

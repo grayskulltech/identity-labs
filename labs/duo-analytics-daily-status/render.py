@@ -1,0 +1,396 @@
+#!/usr/bin/env python3
+"""Render a Duo Analytics fleet-status model (JSON) into the daily status HTML.
+
+Usage:
+    python render.py status.json -o daily-status.html
+    python render.py status.json --anonymize -o sample.html
+
+The model schema is documented in README.md. The renderer is deliberately
+opinionated about *presentation*: it derives an action queue from the raw
+checks, collapses healthy rows, and prints every recovery command exactly once.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+HERE = Path(__file__).resolve().parent
+
+STREAMS = [
+    ("auth", "Auth", "auth_logs"),
+    ("telephony", "Telephony", "telephony_logs"),
+    ("admin", "Admin", "admin_logs"),
+    ("trust_monitor", "Trust Monitor", "trust_monitor_events"),
+]
+
+# Recovery commands, printed once per action instead of once per failing row.
+RUNBOOK = {
+    "dls_restart": "docker restart {slug}-duologsync",
+    "dls_recreate": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps {slug}-dls",
+    "pull_stream": "set DUO_TENANT_SLUG={slug} && python pull.py --logs-only   # streams: {streams}",
+    "pull_admin": "python pull_activity.py --tenant {slug}",
+    "drift_fix": "python schema_drift.py --tenant {slug} --apply",
+}
+
+SEVERITY_RANK = {"RED": 0, "AMBER": 1, "INFO": 2, "GREEN": 3}
+SEVERITY_LABEL = {"RED": "ERR", "AMBER": "WARN", "GREEN": "OK", "INFO": "INFO"}
+SEVERITY_GLYPH = {"RED": "■", "AMBER": "▲", "GREEN": "●", "INFO": "○"}
+
+
+# ----------------------------------------------------------------------------- filters
+def fmt_age(hours: float | None) -> str:
+    if hours is None:
+        return "—"
+    if hours < 0:
+        return "0m"
+    if hours < 1:
+        return f"{round(hours * 60)}m"
+    if hours < 48:
+        return f"{hours:.1f}h".replace(".0h", "h")
+    return f"{hours / 24:.0f}d"
+
+
+def fmt_int(n) -> str:
+    if n is None:
+        return "—"
+    return f"{int(n):,}"
+
+
+def fmt_compact(n) -> str:
+    if n is None:
+        return "—"
+    n = float(n)
+    for unit, div in (("M", 1e6), ("K", 1e3)):
+        if abs(n) >= div:
+            v = n / div
+            return f"{v:.1f}{unit}".replace(".0", "")
+    return f"{int(n):,}"
+
+
+def fmt_mb(mb) -> str:
+    if mb is None:
+        return "—"
+    if mb >= 1024:
+        return f"{mb / 1024:.1f} GB"
+    if mb >= 1:
+        return f"{mb:.0f} MB"
+    return f"{mb * 1024:.0f} KB"
+
+
+def fmt_ts(iso: str | None, with_date=True) -> str:
+    if not iso:
+        return "—"
+    ts = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    return ts.strftime("%Y-%m-%d %H:%M") if with_date else ts.strftime("%H:%M")
+
+
+def fmt_duration(seconds: float | None) -> str:
+    if seconds is None:
+        return "—"
+    m, s = divmod(int(round(seconds)), 60)
+    return f"{m}m {s:02d}s" if m else f"{s}s"
+
+
+def sev_label(s: str) -> str:
+    return SEVERITY_LABEL.get(s, s)
+
+
+def sev_glyph(s: str) -> str:
+    return SEVERITY_GLYPH.get(s, "")
+
+
+def humanize_check(name: str) -> str:
+    return name.replace("_", " ")
+
+
+# ------------------------------------------------------------------------ derivations
+def worst(*statuses: str) -> str:
+    return min((s for s in statuses if s), key=lambda s: SEVERITY_RANK.get(s, 9), default="GREEN")
+
+
+def stream_cell(stream: dict) -> dict:
+    """One matrix cell: the worst of freshness/ingest, with the two numbers a reader needs."""
+    fr, ing, cp = stream["freshness"], stream["ingest"], stream["checkpoint"]
+    status = worst(fr["status"], ing["status"])
+    if fr.get("no_data"):
+        primary, secondary = "no data", "never received"
+    else:
+        primary = fmt_age(fr["age_h"])
+        secondary = f"{fmt_compact(ing['rows_24h'])} rows/24h"
+    limit = f"limit {fmt_age(fr['threshold_h'])}" if fr.get("threshold_h") else ""
+    cp_note = None
+    if cp.get("missing"):
+        cp_note = "checkpoint missing"
+    elif cp.get("age_h") is not None and cp["age_h"] > 24 * 7:
+        cp_note = f"checkpoint {fmt_age(cp['age_h'])} old"
+    return {"status": status, "primary": primary, "secondary": secondary, "limit": limit,
+            "checkpoint_note": cp_note, "checkpoint_status": cp["status"]}
+
+
+def tenant_issues(t: dict) -> list[dict]:
+    """Every non-OK, non-informational row for a tenant, as one sentence each."""
+    out = []
+    for key, label, _ in STREAMS:
+        s = t["streams"][key]
+        fr, ing, dow, cp = s["freshness"], s["ingest"], s["dow"], s["checkpoint"]
+        if fr["status"] != "GREEN":
+            if fr.get("no_data"):
+                text = "no rows ever received"
+            else:
+                text = f"last row {fmt_ts(fr['last_seen'])} UTC ({fmt_age(fr['age_h'])} ago"
+                text += f", limit {fmt_age(fr['threshold_h'])})" if fr.get("threshold_h") else ")"
+            out.append({"status": fr["status"], "check": f"{label} freshness", "text": text})
+        if ing["status"] != "GREEN":
+            out.append({"status": ing["status"], "check": f"{label} ingest",
+                        "text": f"{fmt_int(ing['rows_24h'])} rows in 24h ({fmt_compact(ing['lifetime'])} lifetime)"})
+        if dow["status"] != "GREEN" and "yesterday" in dow:
+            out.append({"status": dow["status"], "check": f"{label} volume",
+                        "text": f"yesterday {fmt_int(dow['yesterday'])} vs same-weekday median {fmt_int(dow['median'])}"})
+        if cp["status"] != "GREEN":
+            text = "checkpoint file missing in container" if cp.get("missing") else \
+                f"DLS checkpoint {fmt_ts(cp['at'])} UTC ({fmt_age(cp['age_h'])} old)"
+            out.append({"status": cp["status"], "check": f"{label} checkpoint", "text": text})
+    p = t["pull"]
+    if p["status"] != "GREEN":
+        out.append({"status": p["status"], "check": "API pull",
+                    "text": f"last completed {fmt_ts(p['completed_at'])} UTC ({fmt_age(p['age_h'])} ago)"})
+    d = t["db"]["drift"]
+    if not d["ok"]:
+        out.append({"status": d["status"], "check": "Schema drift",
+                    "text": f"{d['tables']} tables missing merge columns, {fmt_int(d['rows_stuck'])} rows stuck in staging"})
+    q = t["quality"]
+    if q["status"] != "GREEN":
+        shown = ", ".join(q["gap_dates_shown"][:5])
+        out.append({"status": q["status"], "check": "Gaps (30d)",
+                    "text": f"{q['gap_days_30d']} days with no data. Includes {shown}"})
+    ce = t["container_errors"]
+    if ce["status"] != "GREEN":
+        out.append({"status": ce["status"], "check": "Container log",
+                    "text": f"{ce['lines']} ERROR lines in the last {ce['window']} log lines"})
+    for k, v in t["slo"].items():
+        if v["status"] in ("RED", "AMBER"):
+            window = f" ({v['window'][0]} to {v['window'][1]})" if v.get("window") else ""
+            out.append({"status": v["status"], "check": f"SLO {humanize_check(k)}",
+                        "text": f"{v['pct']:.1f}% over {v['samples']} daily samples{window}"})
+    c = t["cost"]
+    if c["status"] != "GREEN":
+        out.append({"status": c["status"], "check": "Telephony credits",
+                    "text": f"{fmt_int(c['credits_24h'])} credits across {fmt_int(c['telephony_txns_24h'])} transactions in 24h"})
+    sec = t["security"]
+    if sec["bypass_status"] != "GREEN":
+        out.append({"status": sec["bypass_status"], "check": "Bypass codes",
+                    "text": f"{sec['bypass_codes']} unexpired (threshold {sec['bypass_threshold']})"})
+    out.sort(key=lambda r: SEVERITY_RANK[r["status"]])
+    return out
+
+
+def derive_actions(model: dict) -> list[dict]:
+    """Group failing checks by root cause so the reader gets a short, ordered queue."""
+    actions = []
+    tenants = model["tenants"]
+
+    # 1. One action per tenant with a broken stream: stalled (had data, stopped) or never bootstrapped.
+    for t in tenants:
+        stalled, never = [], []
+        for key, label, _ in STREAMS:
+            s = t["streams"][key]
+            if s["freshness"].get("no_data"):
+                never.append((key, label, s))
+            elif worst(s["freshness"]["status"], s["ingest"]["status"]) in ("RED", "AMBER"):
+                stalled.append((key, label, s))
+        drift = t["db"]["drift"]
+        if not stalled and not never and drift["ok"]:
+            continue
+        sev = worst(*(worst(s["freshness"]["status"], s["ingest"]["status"]) for _, _, s in stalled + never),
+                    drift["status"] if not drift["ok"] else "GREEN")
+        auth = t["streams"]["auth"]
+        auth_flowing = auth["freshness"]["status"] == "GREEN" and auth["ingest"]["rows_24h"] > 0
+        parts, cmds = [], []
+        if never:
+            parts.append(f"{', '.join(l for _, l, _ in never)} never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for {'these streams' if len(never) > 1 else 'this stream'}.")
+        if stalled:
+            names = ", ".join(l for _, l, _ in stalled)
+            if auth_flowing:
+                parts.append(f"{names} stopped arriving while auth is still flowing, so the container is alive but {'these streams are' if len(stalled) > 1 else 'this stream is'} dead.")
+            else:
+                parts.append(f"{names} stopped arriving.")
+            stale = [(l, s["checkpoint"]["age_h"]) for _, l, s in stalled if s["checkpoint"].get("age_h") and s["checkpoint"]["age_h"] > 24 * 7]
+            if stale:
+                parts.append("DLS checkpoints are old (" + ", ".join(f"{l} {fmt_age(h)}" for l, h in stale) +
+                             "), so DLS has not written those streams in a long time and the API pull has been the real source.")
+            else:
+                parts.append("Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.")
+        if not drift["ok"]:
+            parts.append(f"Staging tables are missing the merge columns, so {fmt_int(drift['rows_stuck'])} rows are stuck and nothing lands until the drift fix runs.")
+            if drift.get("fix"):
+                cmds.append({"cmd": drift["fix"], "note": "first: unblock the merge"})
+        if never and not stalled:
+            cmds.append({"cmd": RUNBOOK["dls_recreate"].format(slug=t["slug"]), "note": None})
+            cmds.append({"cmd": f"docker logs --tail 200 {t['slug']}-duologsync", "note": "look for the auth or API error that stopped the first sync"})
+        else:
+            cmds.append({"cmd": RUNBOOK["dls_restart"].format(slug=t["slug"]), "note": None})
+            cmds.append({"cmd": RUNBOOK["dls_recreate"].format(slug=t["slug"]), "note": "only if the restart does not clear it"})
+        api_streams = [k for k, _, _ in stalled + never if k != "admin"]
+        if api_streams:
+            cmds.append({"cmd": RUNBOOK["pull_stream"].format(slug=t["slug"], streams=", ".join(api_streams)), "note": "backfill while DLS catches up"})
+        if any(k == "admin" for k, _, _ in stalled + never):
+            cmds.append({"cmd": RUNBOOK["pull_admin"].format(slug=t["slug"]), "note": None})
+        order = [k for k, _, _ in STREAMS]
+        broken = [l for k, l, _ in sorted(stalled + never, key=lambda x: order.index(x[0]))]
+        if never and len(never) >= 3 and not stalled:
+            title = f"{t['name']}: pipeline never bootstrapped"
+        elif not broken:
+            title = f"{t['name']}: schema drift blocking merges"
+        else:
+            title = f"{t['name']}: {', '.join(broken)} {'stalled' if not never else 'not flowing'}"
+        actions.append({"severity": sev, "group": "stream", "lab": t["lab"], "title": title,
+                        "why": " ".join(parts), "tenants": [t["slug"]], "commands": cmds})
+
+    # 2. API fallback pull not running.
+    late = [t for t in tenants if t["pull"]["age_h"] is not None and t["pull"]["age_h"] > 24]
+    if late:
+        actions.append({"severity": "AMBER", "group": "pull",
+                        "title": f"API pull has not completed in over 24h for {len(late)} tenants",
+                        "why": "The scheduled pull is the safety net when DLS drops a stream. " +
+                               "; ".join(f"{t['name']} last ran {fmt_age(t['pull']['age_h'])} ago" for t in late) +
+                               ". The report's scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.",
+                        "tenants": [t["slug"] for t in late], "lab": False,
+                        "commands": [{"cmd": "schtasks /Query /FO LIST /V | findstr /I \"Duo-Analytics\"", "note": "on the report host"},
+                                     {"cmd": f"nssm status {model['fleet']['infra'].get('service_name', 'Duo-Analytics')}", "note": None}]})
+
+    # 3. Containers restarted moments before the run: the GREEN is not yet earned.
+    fresh = [c for c in model["fleet"]["infra"]["containers"] if c["health"] != "healthy"]
+    if fresh:
+        actions.append({"severity": "INFO", "group": "infra", "lab": False,
+                        "title": f"{len(fresh)} containers restarted just before this run",
+                        "why": ", ".join(f"{c['name']} up {c['uptime']}" for c in fresh) +
+                               ". Health is still 'starting', so today's freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.",
+                        "tenants": [c["tenant"] for c in fresh], "commands": []})
+
+    # 4. Observability gaps in the report itself.
+    warming = [t for t in tenants if all(v.get("warming") for v in t["slo"].values())]
+    if len(warming) >= max(2, len(tenants) // 2):
+        actions.append({"severity": "INFO", "group": "report", "lab": False,
+                        "title": f"SLO history exists for only {len(tenants) - len(warming)} of {len(tenants)} tenants",
+                        "why": "Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.",
+                        "tenants": [t["slug"] for t in warming], "commands": []})
+
+    # Customers before labs at equal severity; then streams before everything else.
+    actions.sort(key=lambda a: (SEVERITY_RANK[a["severity"]], a["lab"], a["group"] != "stream"))
+    for i, a in enumerate(actions, 1):
+        a["n"] = i
+    return actions
+
+
+def enrich(model: dict) -> dict:
+    tenants = model["tenants"]
+    for t in tenants:
+        t["cells"] = {k: stream_cell(t["streams"][k]) for k, _, _ in STREAMS}
+        t["issues"] = tenant_issues(t)
+        t["err"] = sum(1 for i in t["issues"] if i["status"] == "RED")
+        t["warn"] = sum(1 for i in t["issues"] if i["status"] == "AMBER")
+        t["headline"] = "; ".join(f"{i['check']} {i['text']}" for i in t["issues"][:2]) or "all checks OK"
+        t["pull_cell"] = {"status": t["pull"]["status"], "primary": fmt_age(t["pull"]["age_h"]),
+                          "secondary": (f"+{fmt_compact(t['pull']['auth_rows'])} auth / +{fmt_compact(t['pull']['tel_rows'])} tel"
+                                        if t["pull"].get("auth_rows") is not None else "")}
+        d = t["db"]["drift"]
+        t["drift_cell"] = {"status": d["status"], "primary": "parity" if d["ok"] else f"{fmt_compact(d['rows_stuck'])} stuck",
+                           "secondary": "" if d["ok"] else f"{d['tables']} tables"}
+        healthy = [f"{label.lower()} stream" for key, label, _ in STREAMS if t["cells"][key]["status"] == "GREEN"]
+        if d["ok"]:
+            healthy.append("staging parity")
+        if t["pull"]["status"] == "GREEN":
+            healthy.append("API pull")
+        if t["container_errors"]["status"] == "GREEN":
+            healthy.append("container log")
+        if t["cost"]["status"] == "GREEN":
+            healthy.append("telephony spend")
+        if t["security"]["bypass_status"] == "GREEN":
+            healthy.append("bypass codes")
+        if t["quality"]["status"] == "GREEN":
+            healthy.append("no data gaps")
+        t["healthy"] = healthy
+        t["change_summary"] = ", ".join(f"{k} {v}" for k, v in sorted(t["changes"]["change_log"].items()))
+    model["actions"] = derive_actions(model)
+    model["customer_tenants"] = [t for t in tenants if not t["lab"]]
+    model["lab_tenants"] = [t for t in tenants if t["lab"]]
+    s = model["summary"]
+    s["total"] = s["ok"] + s["warn"] + s["err"]
+    s["tenants_red"] = sum(1 for t in tenants if t["status"] == "RED")
+    s["tenants_amber"] = sum(1 for t in tenants if t["status"] == "AMBER")
+    s["tenants_green"] = sum(1 for t in tenants if t["status"] == "GREEN")
+    r = model["report"]
+    ts = datetime.fromisoformat(r["generated_at"].replace("Z", "+00:00"))
+    r["date_long"] = ts.strftime("%A %-d %B %Y")
+    r["time_utc"] = ts.strftime("%H:%M UTC")
+    return model
+
+
+# -------------------------------------------------------------------------- anonymize
+def anonymize(model: dict) -> dict:
+    """Replace tenant identity with neutral labels so a rendered sample can be shared."""
+    mapping = {}
+    prod_i = lab_i = 0
+    for t in model["tenants"]:
+        if t["lab"]:
+            lab_i += 1
+            new = f"lab-{chr(96 + lab_i)}"
+            t["name"] = f"Lab Tenant {chr(64 + lab_i)} ({t['edition'].replace('Duo ', '')})"
+        else:
+            prod_i += 1
+            new = f"tenant-{chr(96 + prod_i)}"
+            t["name"] = f"Customer {chr(64 + prod_i)}" + (" (Non-Production)" if "Non-Production" in t["name"] else "")
+        mapping[t["slug"]] = new
+        t["slug"] = new
+        t["account"] = f"ACCT{prod_i + lab_i:02d}"
+        t["frameworks"] = t["frameworks"][:3]
+        t["security"]["users"] = round(t["security"]["users"], -2) if t["security"]["users"] else t["security"]["users"]
+        t["cost"]["active_users"] = round(t["cost"]["active_users"], -2) if t["cost"]["active_users"] else t["cost"]["active_users"]
+        d = t["db"]["drift"]
+        if d.get("fix"):
+            d["fix"] = RUNBOOK["drift_fix"].format(slug=new)
+    for c in model["fleet"]["infra"]["containers"]:
+        c["tenant"] = mapping.get(c["tenant"], c["tenant"])
+        c["name"] = f"{c['tenant']}-duologsync"
+    model["fleet"]["infra"]["host"] = "REPORT-HOST"
+    model["fleet"]["infra"]["service_name"] = "Duo-Analytics"
+    if model["fleet"]["infra"].get("scheduler"):
+        model["fleet"]["infra"]["scheduler"]["note"] = "collector found 0 scheduled tasks"
+    if model["fleet"]["infra"].get("nssm"):
+        model["fleet"]["infra"]["nssm"]["note"] = "nssm not on PATH"
+    model["report"]["run_id"] = "20260906T110000Z-sample"
+    return model
+
+
+# ------------------------------------------------------------------------------- main
+def render(model: dict, anonymize_output: bool = False) -> str:
+    if anonymize_output:
+        model = anonymize(model)
+    model = enrich(model)
+    env = Environment(loader=FileSystemLoader(HERE / "templates"), autoescape=True,
+                      trim_blocks=True, lstrip_blocks=True)
+    env.filters.update({"age": fmt_age, "int": fmt_int, "compact": fmt_compact, "mb": fmt_mb, "ts": fmt_ts,
+                        "duration": fmt_duration, "sev": sev_label, "glyph": sev_glyph, "human": humanize_check})
+    env.globals["STREAMS"] = STREAMS
+    env.globals["RUNBOOK"] = RUNBOOK
+    return env.get_template("daily_status.html.j2").render(m=model)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("model", type=Path, help="fleet-status JSON")
+    ap.add_argument("-o", "--out", type=Path, required=True, help="output HTML path")
+    ap.add_argument("--anonymize", action="store_true", help="replace tenant identity with neutral labels")
+    args = ap.parse_args()
+    model = json.loads(args.model.read_text())
+    args.out.write_text(render(model, args.anonymize))
+    print(f"wrote {args.out} ({args.out.stat().st_size // 1024} KB)")
+
+
+if __name__ == "__main__":
+    main()

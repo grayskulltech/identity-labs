@@ -1,0 +1,1630 @@
+{
+ "report": {
+  "product": "Duo Analytics",
+  "kind": "Daily Status",
+  "date": "2026-09-06",
+  "generated_at": "2026-09-06T11:00:00Z",
+  "overall": "RED",
+  "confidential": true,
+  "collect_seconds": 553.6,
+  "collector_errors": 0,
+  "run_id": "20260906T110000Z-sample"
+ },
+ "summary": {
+  "tenants": 8,
+  "ok": 110,
+  "warn": 61,
+  "err": 24
+ },
+ "fleet": {
+  "duo_status": {
+   "status": "GREEN",
+   "note": "no active or recent (24h) incidents on status.duo.com"
+  },
+  "duo_releases_7d": 1,
+  "latest_release": "2026-09-03",
+  "deploys_24h": 0,
+  "infra": {
+   "host": "REPORT-HOST",
+   "service_name": "Duo-Analytics",
+   "containers": [
+    {
+     "name": "tenant-a-duologsync",
+     "uptime": "52 seconds",
+     "health": "starting",
+     "tenant": "tenant-a"
+    },
+    {
+     "name": "tenant-b-duologsync",
+     "uptime": "4 hours",
+     "health": "healthy",
+     "tenant": "tenant-b"
+    },
+    {
+     "name": "tenant-c-duologsync",
+     "uptime": "4 hours",
+     "health": "healthy",
+     "tenant": "tenant-c"
+    },
+    {
+     "name": "lab-a-duologsync",
+     "uptime": "4 hours",
+     "health": "healthy",
+     "tenant": "lab-a"
+    },
+    {
+     "name": "lab-b-duologsync",
+     "uptime": "59 minutes",
+     "health": "healthy",
+     "tenant": "lab-b"
+    },
+    {
+     "name": "lab-c-duologsync",
+     "uptime": "about a minute",
+     "health": "starting",
+     "tenant": "lab-c"
+    },
+    {
+     "name": "tenant-d-duologsync",
+     "uptime": "about a minute",
+     "health": "starting",
+     "tenant": "tenant-d"
+    },
+    {
+     "name": "tenant-e-duologsync",
+     "uptime": "59 minutes",
+     "health": "healthy",
+     "tenant": "tenant-e"
+    }
+   ],
+   "disk": {
+    "pct_free": 49.5,
+    "free_gb": 471.3,
+    "total_gb": 951.6,
+    "volume": "C:"
+   },
+   "scheduler": {
+    "tasks_seen": 0,
+    "status": "GREEN",
+    "note": "collector found 0 scheduled tasks"
+   },
+   "nssm": {
+    "status": "INFO",
+    "note": "nssm not on PATH"
+   }
+  }
+ },
+ "tenants": [
+  {
+   "slug": "tenant-a",
+   "name": "Customer A",
+   "account": "ACCT01",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T10:50:00Z",
+      "age_h": 0.2,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 11904,
+      "lifetime": 27149044
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 14826,
+      "median": 2933
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T10:56:00Z",
+      "age_h": 0.1
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-05T10:15:00Z",
+      "age_h": 24.8,
+      "threshold_h": 4.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 8149596
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 505,
+      "median": 1542,
+      "samples_raw": "1,648,1,933,1,437,1,255"
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-04-17T12:53:00Z",
+      "age_h": 3406.1
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-04T23:54:00Z",
+      "age_h": 35.1,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 944860
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 972,
+      "samples_raw": "689,919,1,026,1,459"
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-05-19T23:29:00Z",
+      "age_h": 2627.5
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-09-04T17:25:00Z",
+      "age_h": 41.6,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 3829
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 2
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2025-12-31T03:21:00Z",
+      "age_h": 5983.6
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T10:04:44Z",
+    "age_h": 0.9,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 183705.6,
+    "wal_mb": 131.7,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 12,
+    "gap_dates_shown": [
+     "2026-08-15",
+     "2026-08-16",
+     "2026-08-17",
+     "2026-08-18",
+     "2026-08-19"
+    ],
+    "shapes_24h": 284
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "RED",
+     "warming": false,
+     "pct": 63.64,
+     "samples": 33,
+     "window": null
+    },
+    "telephony_freshness": {
+     "status": "RED",
+     "warming": false,
+     "pct": 54.55,
+     "samples": 33,
+     "window": [
+      "2026-08-07",
+      "2026-09-05"
+     ]
+    },
+    "ingest_volume": {
+     "status": "RED",
+     "warming": false,
+     "pct": 63.64,
+     "samples": 33,
+     "window": [
+      "2026-08-07",
+      "2026-09-05"
+     ]
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 5,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 3,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-04T10:32:57Z",
+    "users": 83500,
+    "admins": 518,
+    "telephony_credits": 8995282,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 77900
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "17",
+     "n/a": "3"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITECH",
+    "HITRUST_CSF"
+   ]
+  },
+  {
+   "slug": "tenant-b",
+   "name": "Customer B",
+   "account": "ACCT02",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:36:00Z",
+      "age_h": 1.4,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 99,
+      "lifetime": 37095
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 119,
+      "median": 66
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T09:36:00Z",
+      "age_h": 1.4
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-05T21:09:00Z",
+      "age_h": 13.8,
+      "threshold_h": 4.0
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 26,
+      "lifetime": 12950
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 26,
+      "median": 18
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-05T21:09:00Z",
+      "age_h": 13.8
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T00:33:00Z",
+      "age_h": 10.4,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 7,
+      "lifetime": 5677
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 5,
+      "median": 4
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T00:33:00Z",
+      "age_h": 10.4
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-09-03T16:04:00Z",
+      "age_h": 66.9,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 63
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-03T16:04:00Z",
+      "age_h": 66.9
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T07:00:40Z",
+    "age_h": 4.0,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 827.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "GREEN",
+    "gap_days_30d": 0,
+    "gap_dates_shown": [],
+    "shapes_24h": 796
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "GREEN",
+    "lines": 0,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T07:00:28Z",
+    "users": 600,
+    "admins": 23,
+    "telephony_credits": 1432418,
+    "admin_actions_24h": 7
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 48,
+    "telephony_txns_24h": 26,
+    "active_users": 600
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "15"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITECH",
+    "HITRUST_CSF"
+   ]
+  },
+  {
+   "slug": "tenant-c",
+   "name": "Customer C",
+   "account": "ACCT03",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T10:53:00Z",
+      "age_h": 0.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 1183,
+      "lifetime": 1935396
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 1277,
+      "median": 1301
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T11:05:00Z",
+      "age_h": -0.1
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T07:22:00Z",
+      "age_h": 3.6,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 30,
+      "lifetime": 46761
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 44,
+      "median": 41
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T07:22:00Z",
+      "age_h": 3.6
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-04T07:43:00Z",
+      "age_h": 51.3,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 5935267
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 631,
+      "samples_raw": "567,853,696,468"
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-05-13T16:08:00Z",
+      "age_h": 2778.9
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T17:45:00Z",
+      "age_h": 41.2,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 458
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T17:45:00Z",
+      "age_h": 41.2
+     }
+    }
+   },
+   "pull": {
+    "status": "AMBER",
+    "completed_at": "2026-09-05T08:07:33Z",
+    "age_h": 26.9,
+    "auth_rows": 1,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 39424.0,
+    "wal_mb": 1.4,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "GREEN",
+    "gap_days_30d": 0,
+    "gap_dates_shown": [],
+    "shapes_24h": 0
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "GREEN",
+    "lines": 0,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T08:08:24Z",
+    "users": 2200,
+    "admins": 26,
+    "telephony_credits": 183936,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 60,
+    "telephony_txns_24h": 30,
+    "active_users": 2300
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "16",
+     "n/a": "2"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITECH",
+    "HITRUST_CSF"
+   ]
+  },
+  {
+   "slug": "lab-a",
+   "name": "Lab Tenant A (Premier)",
+   "account": "ACCT04",
+   "edition": "Duo Premier",
+   "status": "RED",
+   "lab": true,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T23:11:00Z",
+      "age_h": 35.8,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 1312
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T23:11:00Z",
+      "age_h": 35.8
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-07-17T01:26:00Z",
+      "age_h": 1233.6,
+      "threshold_h": 168.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 14
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-07-17T01:26:00Z",
+      "age_h": 1233.6
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T10:26:00Z",
+      "age_h": 0.6,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 94,
+      "lifetime": 70416
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 96,
+      "median": 95
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T10:57:00Z",
+      "age_h": 0.1
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-06-13T13:20:00Z",
+      "age_h": 2037.7,
+      "threshold_h": 168.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 1
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-06-13T13:20:00Z",
+      "age_h": 2037.7
+     }
+    }
+   },
+   "pull": {
+    "status": "AMBER",
+    "completed_at": "2026-09-05T07:30:17Z",
+    "age_h": 27.5,
+    "auth_rows": 1,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 761.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 22,
+    "gap_dates_shown": [
+     "2026-08-27",
+     "2026-08-28",
+     "2026-08-29",
+     "2026-08-30",
+     "2026-09-05"
+    ],
+    "shapes_24h": 0
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "GREEN",
+    "lines": 0,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T07:30:19Z",
+    "users": 0,
+    "admins": 0,
+    "telephony_credits": 1877,
+    "admin_actions_24h": 94
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 0
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "12",
+     "n/a": "5"
+    }
+   },
+   "frameworks": [
+    "SOC2",
+    "CIS_Controls_v8"
+   ]
+  },
+  {
+   "slug": "lab-b",
+   "name": "Lab Tenant B (Advantage)",
+   "account": "ACCT05",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": true,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T15:02:00Z",
+      "age_h": 44.0,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 1138
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T15:02:00Z",
+      "age_h": 44.0
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    }
+   },
+   "pull": {
+    "status": "AMBER",
+    "completed_at": "2026-09-05T08:00:15Z",
+    "age_h": 27.0,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 11.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "RED",
+     "ok": false,
+     "tables": 5,
+     "rows_stuck": 1726,
+     "fix": "python schema_drift.py --tenant lab-b --apply",
+     "detail": "auth_logs(_merged,_staged_at), telephony_logs(_merged,_staged_at), admin_logs(_merged,_staged_at), trust_monitor_events(_merged,_staged_at), offline_enrollment_logs(_merged,_staged_at)."
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 30,
+    "gap_dates_shown": [
+     "2026-09-01",
+     "2026-09-02",
+     "2026-09-03",
+     "2026-09-04",
+     "2026-09-05"
+    ],
+    "shapes_24h": 0
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 1,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T08:00:16Z",
+    "users": 0,
+    "admins": 1,
+    "telephony_credits": 457,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 0
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "3"
+    }
+   },
+   "frameworks": [
+    "SOC2",
+    "CIS_Controls_v8"
+   ]
+  },
+  {
+   "slug": "lab-c",
+   "name": "Lab Tenant C (Essentials)",
+   "account": "ACCT06",
+   "edition": "Duo Essentials",
+   "status": "RED",
+   "lab": true,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T08:20:00Z",
+      "age_h": 50.7,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 41363
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 631,
+      "samples_raw": "567,853,696,0"
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-08-10T14:14:00Z",
+      "age_h": 644.8
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T09:06:58Z",
+    "age_h": 1.9,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 204.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "RED",
+     "ok": false,
+     "tables": 5,
+     "rows_stuck": 16,
+     "fix": "python schema_drift.py --tenant lab-c --apply",
+     "detail": "auth_logs(_merged,_staged_at), telephony_logs(_merged,_staged_at), admin_logs(_merged,_staged_at), trust_monitor_events(_merged,_staged_at), offline_enrollment_logs(_merged,_staged_at)."
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 30,
+    "gap_dates_shown": [
+     "2026-09-01",
+     "2026-09-02",
+     "2026-09-03",
+     "2026-09-04",
+     "2026-09-05"
+    ],
+    "shapes_24h": 215
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 5,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-06T09:07:00Z",
+    "users": 0,
+    "admins": 0,
+    "telephony_credits": 2000,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 0
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "3"
+    }
+   },
+   "frameworks": [
+    "SOC2",
+    "CIS_Controls_v8"
+   ]
+  },
+  {
+   "slug": "tenant-d",
+   "name": "Customer D",
+   "account": "ACCT07",
+   "edition": "Duo Premier",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:51:00Z",
+      "age_h": 1.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 27548,
+      "lifetime": 15673058
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 31458,
+      "median": 31850
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-05T23:38:00Z",
+      "age_h": 11.4
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:56:00Z",
+      "age_h": 1.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 221,
+      "lifetime": 368617
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 341,
+      "median": 365
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T11:05:00Z",
+      "age_h": -0.1
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:56:00Z",
+      "age_h": 1.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 262,
+      "lifetime": 436197
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 501,
+      "median": 631
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-04-21T22:39:00Z",
+      "age_h": 3300.3
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-04T21:08:00Z",
+      "age_h": 37.9,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 1929
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 3
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-01-17T23:09:00Z",
+      "age_h": 5555.9
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T09:59:45Z",
+    "age_h": 1.0,
+    "auth_rows": 9546,
+    "tel_rows": 110
+   },
+   "db": {
+    "size_mb": 119091.2,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "GREEN",
+    "gap_days_30d": 0,
+    "gap_dates_shown": [],
+    "shapes_24h": 895
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 5,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T10:15:37Z",
+    "users": 76400,
+    "admins": 62,
+    "telephony_credits": 13353559,
+    "admin_actions_24h": 262
+   },
+   "cost": {
+    "status": "AMBER",
+    "credits_24h": 278,
+    "telephony_txns_24h": 221,
+    "active_users": 85400
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "17"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITRUST_CSF",
+    "NIST_CSF_2.0"
+   ]
+  },
+  {
+   "slug": "tenant-e",
+   "name": "Customer E (Non-Production)",
+   "account": "ACCT08",
+   "edition": "Duo Premier",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T20:12:00Z",
+      "age_h": 38.8,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 2498
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T20:12:00Z",
+      "age_h": 38.8
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T10:04:00Z",
+      "age_h": 48.9,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 99
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T10:04:00Z",
+      "age_h": 48.9
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T14:50:00Z",
+      "age_h": 44.2,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 147869
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 632,
+      "samples_raw": "569,853,696,468"
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T14:50:00Z",
+      "age_h": 44.2
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T09:38:41Z",
+    "age_h": 1.4,
+    "auth_rows": 1,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 852.2,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 9,
+    "gap_dates_shown": [
+     "2026-08-22",
+     "2026-08-23",
+     "2026-08-29",
+     "2026-08-30",
+     "2026-09-05"
+    ],
+    "shapes_24h": 748
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 1,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-06T09:38:43Z",
+    "users": 53500,
+    "admins": 8,
+    "telephony_credits": 97685,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 43500
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "18",
+     "n/a": "1"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITRUST_CSF",
+    "NIST_CSF_2.0"
+   ]
+  }
+ ]
+}
