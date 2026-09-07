@@ -12,7 +12,7 @@ Identity Intelligence labs and examples.
 
 | Lab | Summary |
 |---|---|
-| [Claude in Apple Intelligence](labs/apple-intelligence-claude/README.md) | Route Siri, Writing Tools, and Shortcuts to Claude via OS 27 Extensions; build Claude into your own app with Apple's Foundation Models framework; MDM guardrails and a production relay |
+| [Claude in Apple Intelligence](labs/apple-intelligence-claude/README.md) | Route Siri, Writing Tools, and Shortcuts to Claude via OS 27 Extensions; give Siri access to your own MCP gateway through an App Intent with runtime-discovered tools; MDM guardrails and a production relay |
 
 ## Usage
 

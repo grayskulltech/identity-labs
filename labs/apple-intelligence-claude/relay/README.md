@@ -51,6 +51,19 @@ relay; it listens on plain HTTP.
 node --test
 ```
 
+## MCP gateway stub
+
+`mcp-gateway-stub.mjs` is a separate test double: a Streamable HTTP MCP server with
+one read-only tool and one destructive tool, bearer auth, and in-memory sessions.
+Use it to exercise the Swift `MCPBridge` client before pointing the app at a real
+gateway.
+
+```sh
+MCP_STUB_TOKEN=dev node mcp-gateway-stub.mjs
+```
+
+Endpoint: `http://127.0.0.1:8788/mcp`. See `docs/05-mcp-gateway-bridge.md`.
+
 ## Hardening for production
 
 - Replace the shared bearer token with a per-user token minted by your IdP so the

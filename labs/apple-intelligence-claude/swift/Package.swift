@@ -13,6 +13,7 @@ let package = Package(
         .watchOS(.v27),
     ],
     products: [
+        .library(name: "MCPBridge", targets: ["MCPBridge"]),
         .library(name: "IdentityAssistant", targets: ["IdentityAssistant"]),
     ],
     dependencies: [
@@ -22,11 +23,18 @@ let package = Package(
         ),
     ],
     targets: [
+        // Model-agnostic: turns an MCP gateway's tools into Foundation Models tools.
+        .target(name: "MCPBridge"),
         .target(
             name: "IdentityAssistant",
             dependencies: [
+                "MCPBridge",
                 .product(name: "ClaudeForFoundationModels", package: "ClaudeForFoundationModels"),
             ]
+        ),
+        .testTarget(
+            name: "MCPBridgeTests",
+            dependencies: ["MCPBridge"]
         ),
         .testTarget(
             name: "IdentityAssistantTests",

@@ -14,6 +14,11 @@ coverage, so this lab keeps them apart:
 On iOS 26 neither exists. The only bridge is the Claude app's **Ask Claude** App
 Intent driven from Shortcuts or Siri, documented in the fallback guide.
 
+If the goal is for Siri to reach **your own tools** rather than the consumer Claude
+app, neither surface above does it directly. The path is your app's App Intent,
+which runs a model with tools discovered at runtime from your MCP gateway. That is
+`docs/05-mcp-gateway-bridge.md` and the `MCPBridge` target.
+
 ## Contents
 
 | Path | Purpose |
@@ -22,9 +27,10 @@ Intent driven from Shortcuts or Siri, documented in the fallback guide.
 | `docs/02-shortcuts-ios26.md` | Fallback for iOS 26 devices using the Ask Claude App Intent and Shortcuts |
 | `docs/03-mdm-guardrails.md` | Restriction keys, data-flow analysis, and the allow/deny decision matrix |
 | `docs/04-in-app-foundation-models.md` | Developer integration with `ClaudeForFoundationModels`, auth modes, routing policy |
+| `docs/05-mcp-gateway-bridge.md` | Siri to your own MCP gateway: App Intent, runtime tool discovery, tool policy |
 | `mdm/` | Ready-to-sign configuration profiles for the deny and allow postures |
-| `swift/` | Swift package: identity triage assistant built on Foundation Models + Claude |
-| `relay/` | Zero-dependency Node relay for the `.proxied` auth mode, with tests |
+| `swift/` | Swift package: `MCPBridge` (MCP tools as Foundation Models tools) and `IdentityAssistant` (Claude, routing, Siri intent) |
+| `relay/` | Zero-dependency Node relay for the `.proxied` auth mode and a local MCP gateway stub, with tests |
 
 ## Architecture
 
@@ -41,7 +47,11 @@ flowchart LR
     end
     Relay[Your relay]
 
+    Gateway[Your MCP gateway]
+
     Siri -- Extensions routing --> ClaudeApp
+    Siri -- App Intent --> YourApp
+    YourApp -- MCPBridge tools --> Gateway
     ClaudeApp -- HTTPS --> API
     YourApp -- ClaudeLanguageModel .appAttest --> API
     YourApp -- ClaudeLanguageModel .proxied --> Relay --> API
