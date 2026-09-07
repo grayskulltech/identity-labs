@@ -231,10 +231,10 @@
     </div>
     <div class="strip">
       <div class="tile">
-        <div class="label">Tenants</div>
-        <div class="value">8</div>
-        <div class="sub">8 err · 0 warn · 0 ok</div>
-      </div>
+        <div class="label">Customer tenants</div>
+        <div class="value">4</div>
+        <div class="sub">4 err · 0 warn · 0 ok</div>
+<div class="sub">+ 4 lab/non-prod (4 err · 0 warn), excluded from fleet status</div>      </div>
       <div class="tile">
         <div class="label">Checks</div>
         <div class="value">163</div>
@@ -333,20 +333,6 @@ python pull_activity.py --tenant lab-c</pre>
       <article class="act AMBER">
         <div class="n">06</div>
         <div class="body">
-          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Customer E (Non-Production): Auth, Telephony, Admin stalled</h3></div>
-          <p class="why">Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
-          <div class="tags"><span class="tag">tenant-e</span></div>
-          <pre class="cmd">docker restart tenant-e-duologsync
-<span class="c"># only if the restart does not clear it</span>
-docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls
-<span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=tenant-e &amp;&amp; python pull.py --logs-only   # streams: auth, telephony
-python pull_activity.py --tenant tenant-e</pre>
-        </div>
-      </article>
-      <article class="act AMBER">
-        <div class="n">07</div>
-        <div class="body">
           <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>API pull has not completed in over 24h for 3 tenants</h3></div>
           <p class="why">The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report&#39;s scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.</p>
           <div class="tags"><span class="tag">tenant-c</span><span class="tag">lab-a</span><span class="tag">lab-b</span></div>
@@ -356,7 +342,7 @@ nssm status Duo-Analytics</pre>
         </div>
       </article>
       <article class="act AMBER">
-        <div class="n">08</div>
+        <div class="n">07</div>
         <div class="body">
           <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Lab Tenant A (Premier): Auth, Telephony stalled</h3></div>
           <p class="why">Auth, Telephony stopped arriving. DLS checkpoints are old (Telephony 51d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
@@ -366,6 +352,20 @@ nssm status Duo-Analytics</pre>
 docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-a-dls
 <span class="c"># backfill while DLS catches up</span>
 set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: auth, telephony</pre>
+        </div>
+      </article>
+      <article class="act AMBER">
+        <div class="n">08</div>
+        <div class="body">
+          <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Customer E (Non-Production): Auth, Telephony, Admin stalled</h3></div>
+          <p class="why">Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
+          <div class="tags"><span class="tag">tenant-e</span></div>
+          <pre class="cmd">docker restart tenant-e-duologsync
+<span class="c"># only if the restart does not clear it</span>
+docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls
+<span class="c"># backfill while DLS catches up</span>
+set DUO_TENANT_SLUG=tenant-e &amp;&amp; python pull.py --logs-only   # streams: auth, telephony
+python pull_activity.py --tenant tenant-e</pre>
         </div>
       </article>
       <article class="act INFO">
@@ -460,22 +460,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
   <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
 </td>
           </tr>
-          <tr>
-            <td class="tenant"><div class="name">Customer E (Non-Production)</div><div class="slug">tenant-e · Duo Premier</div></td>
-<td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>38.8h<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>2d<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div></td><td class="cell">
-  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>44.2h<span class="sr" hidden>WARN</span></div>
-<div class="s">0 rows/24h</div></td>            <td class="cell">
-  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.4h<span class="sr" hidden>OK</span></div>
-<div class="s">+1 auth / +0 tel</div></td>
-            <td class="cell">
-  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
-</td>
-          </tr>
-          <tr class="group"><td colspan="6">Lab tenants</td></tr>
+          <tr class="group"><td colspan="6">Lab &amp; non-production tenants — excluded from fleet status</td></tr>
           <tr>
             <td class="tenant"><div class="name">Lab Tenant A (Premier)</div><div class="slug">lab-a · Duo Premier</div></td>
 <td class="cell">
@@ -520,6 +505,21 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
             <td class="cell">
   <div class="v RED"><span class="g" aria-hidden="true">■</span>16 stuck<span class="sr" hidden>ERR</span></div>
 <div class="s">5 tables</div></td>
+          </tr>
+          <tr>
+            <td class="tenant"><div class="name">Customer E (Non-Production)</div><div class="slug">tenant-e · Duo Premier</div></td>
+<td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>38.8h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>2d<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td><td class="cell">
+  <div class="v AMBER"><span class="g" aria-hidden="true">▲</span>44.2h<span class="sr" hidden>WARN</span></div>
+<div class="s">0 rows/24h</div></td>            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>1.4h<span class="sr" hidden>OK</span></div>
+<div class="s">+1 auth / +0 tel</div></td>
+            <td class="cell">
+  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
+</td>
           </tr>
         </tbody>
       </table>

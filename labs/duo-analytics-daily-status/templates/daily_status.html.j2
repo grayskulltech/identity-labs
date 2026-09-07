@@ -242,9 +242,10 @@
     </div>
     <div class="strip">
       <div class="tile">
-        <div class="label">Tenants</div>
-        <div class="value">{{ m.summary.tenants }}</div>
+        <div class="label">Customer tenants</div>
+        <div class="value">{{ m.customer_tenants|length }}</div>
         <div class="sub">{{ m.summary.tenants_red }} err · {{ m.summary.tenants_amber }} warn · {{ m.summary.tenants_green }} ok</div>
+        {% if m.summary.nonprod_tenants %}<div class="sub">+ {{ m.summary.nonprod_tenants }} lab/non-prod ({{ m.summary.nonprod_red }} err · {{ m.summary.nonprod_amber }} warn), excluded from fleet status</div>{% endif %}
       </div>
       <div class="tile">
         <div class="label">Checks</div>
@@ -309,8 +310,8 @@
             {{ cell(t.drift_cell) }}
           </tr>
           {% endfor %}
-          <tr class="group"><td colspan="{{ STREAMS|length + 3 }}">Lab tenants</td></tr>
-          {% for t in m.lab_tenants %}
+          <tr class="group"><td colspan="{{ STREAMS|length + 3 }}">Lab &amp; non-production tenants — excluded from fleet status</td></tr>
+          {% for t in m.nonprod_tenants %}
           <tr>
             <td class="tenant"><div class="name">{{ t.name }}</div><div class="slug">{{ t.slug }} · {{ t.edition }}</div></td>
             {% for key, _, _ in STREAMS %}{{ cell(t.cells[key]) }}{% endfor %}

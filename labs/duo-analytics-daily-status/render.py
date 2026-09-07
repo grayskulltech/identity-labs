@@ -46,6 +46,30 @@ SEVERITY_RANK = {"RED": 0, "AMBER": 1, "INFO": 2, "GREEN": 3}
 SEVERITY_LABEL = {"RED": "ERR", "AMBER": "WARN", "GREEN": "OK", "INFO": "INFO"}
 SEVERITY_GLYPH = {"RED": "■", "AMBER": "▲", "GREEN": "●", "INFO": "○"}
 
+# A tenant in this set never drives the fleet-wide verdict or the customer
+# red/amber/warn/ok tile: a lab tenant, or anything that is a non-production
+# copy of a real customer (e.g. "NYU Langone Health (Non-Production)"). Its
+# problems still show up in the action queue and its own detail row — they
+# still need fixing — they just cannot make the headline say a customer is
+# affected when none is.
+NONPROD_NAME_HINTS = ("non-production", "non prod", "nonprod")
+
+
+def is_nonprod(t: dict) -> bool:
+    """True if a tenant should be excluded from the fleet/customer verdict.
+
+    Prefers an explicit `nonprod` field from the collector; falls back to the
+    `lab` flag (account prefix `LAB*`) and then to name/slug matching so a
+    tenant like NYU Langone's non-production copy is caught even though it
+    is not a lab account.
+    """
+    if t.get("nonprod") is not None:
+        return bool(t["nonprod"])
+    if t.get("lab"):
+        return True
+    haystack = f"{t.get('name', '')} {t.get('slug', '')}".lower()
+    return any(hint in haystack for hint in NONPROD_NAME_HINTS)
+
 
 # ----------------------------------------------------------------------------- filters
 def fmt_age(hours: float | None) -> str:
@@ -253,7 +277,7 @@ def derive_actions(model: dict) -> list[dict]:
             title = f"{t['name']}: schema drift blocking merges"
         else:
             title = f"{t['name']}: {', '.join(broken)} {'stalled' if not never else 'not flowing'}"
-        actions.append({"severity": sev, "group": "stream", "lab": t["lab"], "title": title,
+        actions.append({"severity": sev, "group": "stream", "nonprod": t["nonprod"], "title": title,
                         "why": " ".join(parts), "tenants": [t["slug"]], "commands": cmds})
 
     # 2. API fallback pull not running.
@@ -264,14 +288,14 @@ def derive_actions(model: dict) -> list[dict]:
                         "why": "The scheduled pull is the safety net when DLS drops a stream. " +
                                "; ".join(f"{t['name']} last ran {fmt_age(t['pull']['age_h'])} ago" for t in late) +
                                ". The report's scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.",
-                        "tenants": [t["slug"] for t in late], "lab": False,
+                        "tenants": [t["slug"] for t in late], "nonprod": False,
                         "commands": [{"cmd": "schtasks /Query /FO LIST /V | findstr /I \"Duo-Analytics\"", "note": "on the report host"},
                                      {"cmd": f"nssm status {model['fleet']['infra'].get('service_name', 'Duo-Analytics')}", "note": None}]})
 
     # 3. Containers restarted moments before the run: the GREEN is not yet earned.
     fresh = [c for c in model["fleet"]["infra"]["containers"] if c["health"] != "healthy"]
     if fresh:
-        actions.append({"severity": "INFO", "group": "infra", "lab": False,
+        actions.append({"severity": "INFO", "group": "infra", "nonprod": False,
                         "title": f"{len(fresh)} containers restarted just before this run",
                         "why": ", ".join(f"{c['name']} up {c['uptime']}" for c in fresh) +
                                ". Health is still 'starting', so today's freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.",
@@ -280,13 +304,13 @@ def derive_actions(model: dict) -> list[dict]:
     # 4. Observability gaps in the report itself.
     warming = [t for t in tenants if all(v.get("warming") for v in t["slo"].values())]
     if len(warming) >= max(2, len(tenants) // 2):
-        actions.append({"severity": "INFO", "group": "report", "lab": False,
+        actions.append({"severity": "INFO", "group": "report", "nonprod": False,
                         "title": f"SLO history exists for only {len(tenants) - len(warming)} of {len(tenants)} tenants",
                         "why": "Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.",
                         "tenants": [t["slug"] for t in warming], "commands": []})
 
-    # Customers before labs at equal severity; then streams before everything else.
-    actions.sort(key=lambda a: (SEVERITY_RANK[a["severity"]], a["lab"], a["group"] != "stream"))
+    # Customers before non-production tenants at equal severity; then streams before everything else.
+    actions.sort(key=lambda a: (SEVERITY_RANK[a["severity"]], a["nonprod"], a["group"] != "stream"))
     for i, a in enumerate(actions, 1):
         a["n"] = i
     return actions
@@ -315,6 +339,7 @@ def enrich(model: dict) -> dict:
     tenants = model["tenants"]
     retire_deprecated(model)
     for t in tenants:
+        t["nonprod"] = is_nonprod(t)
         t["cells"] = {k: stream_cell(t["streams"][k]) for k, _, _ in STREAMS}
         t["issues"] = tenant_issues(t)
         # Status is recomputed from what is left once deprecated checks are gone.
@@ -344,15 +369,24 @@ def enrich(model: dict) -> dict:
         t["healthy"] = healthy
         t["change_summary"] = ", ".join(f"{k} {v}" for k, v in sorted(t["changes"]["change_log"].items()))
     model["actions"] = derive_actions(model)
-    model["customer_tenants"] = [t for t in tenants if not t["lab"]]
-    model["lab_tenants"] = [t for t in tenants if t["lab"]]
+    model["customer_tenants"] = [t for t in tenants if not t["nonprod"]]
+    model["nonprod_tenants"] = [t for t in tenants if t["nonprod"]]
+    customer_tenants = model["customer_tenants"]
     s = model["summary"]
     s["total"] = s["ok"] + s["warn"] + s["err"]
-    s["tenants_red"] = sum(1 for t in tenants if t["status"] == "RED")
-    s["tenants_amber"] = sum(1 for t in tenants if t["status"] == "AMBER")
-    s["tenants_green"] = sum(1 for t in tenants if t["status"] == "GREEN")
+    # Red/amber/ok tenant counts and the fleet-wide verdict are scoped to
+    # customer-facing tenants only. A lab or non-production tenant can still
+    # fill the action queue with real work, but it never turns the headline
+    # red for a customer nobody it affects.
+    s["tenants_red"] = sum(1 for t in customer_tenants if t["status"] == "RED")
+    s["tenants_amber"] = sum(1 for t in customer_tenants if t["status"] == "AMBER")
+    s["tenants_green"] = sum(1 for t in customer_tenants if t["status"] == "GREEN")
+    s["nonprod_tenants"] = len(model["nonprod_tenants"])
+    s["nonprod_red"] = sum(1 for t in model["nonprod_tenants"] if t["status"] == "RED")
+    s["nonprod_amber"] = sum(1 for t in model["nonprod_tenants"] if t["status"] == "AMBER")
     r = model["report"]
-    r["overall"] = worst(*(t["status"] for t in tenants))
+    r["overall"] = worst(*(t["status"] for t in customer_tenants)) if customer_tenants \
+        else worst(*(t["status"] for t in tenants))
     ts = datetime.fromisoformat(r["generated_at"].replace("Z", "+00:00"))
     r["date_long"] = ts.strftime("%A %-d %B %Y")
     r["time_utc"] = ts.strftime("%H:%M UTC")

@@ -81,6 +81,21 @@ Statuses use the collector's vocabulary (`RED`, `AMBER`, `GREEN`, `INFO`) and
 are mapped to `ERR`, `WARN`, `OK`, `INFO` at render time so the subject line
 and the body finally agree.
 
+## Fleet status is customer-scoped
+
+A lab tenant or a non-production copy of a real customer (its name or slug
+containing "non-production" / "nonprod", or an explicit `nonprod: true` from
+the collector) never drives the fleet-wide verdict or the "customer tenants"
+red/amber/ok tile — `is_nonprod()` in `render.py` decides this, preferring an
+explicit `nonprod` field, then the `lab` flag, then a name/slug match. Its
+problems still appear in full: its own action-queue entries (schema drift,
+never-bootstrapped, stalled streams), its own row in the stream matrix under
+a separate "Lab & non-production tenants" heading, and its own tenant detail
+section. It just cannot make the headline say a customer is affected when
+none is. The fleet strip shows the excluded count and its err/warn split
+alongside the customer tally, so nothing is hidden, only kept out of the
+verdict.
+
 ## Deprecated streams
 
 `DEPRECATED_STREAMS` in `render.py` lists streams the collector may still
