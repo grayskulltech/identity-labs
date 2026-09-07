@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grayskull.tech/castleops/contract/v1/posture-record.schema.json",
+  "title": "Device posture record produced by DevicePosture",
+  "type": "object",
+  "required": ["device_id", "subject", "status", "model", "enrolled", "last_checkin", "attested", "reported", "keys"],
+  "additionalProperties": false,
+  "properties": {
+    "device_id": { "type": "string", "description": "MDM UDID." },
+    "subject": { "type": "string", "description": "Human subject this device is enrolled to." },
+    "status": { "enum": ["pending", "active", "revoked"] },
+    "model": { "type": "string", "description": "Attested model identifier, e.g. iPhone17,1." },
+    "enrolled": { "type": "boolean" },
+    "supervised": { "type": "boolean", "default": false },
+    "last_checkin": { "type": "string", "format": "date-time" },
+    "attested": {
+      "type": "object",
+      "description": "From Managed Device Attestation. Apple's hardware root vouches for these.",
+      "required": ["os_version", "at", "serial"],
+      "additionalProperties": false,
+      "properties": {
+        "os_version": { "type": "string", "pattern": "^[0-9]+(\\.[0-9]+){0,2}$" },
+        "at": { "type": "string", "format": "date-time" },
+        "serial": { "type": "string" },
+        "sep_firmware": { "type": "string" }
+      }
+    },
+    "reported": {
+      "type": "object",
+      "description": "From Declarative Device Management status. Timely, not attested.",
+      "required": ["os_version", "at"],
+      "additionalProperties": false,
+      "properties": {
+        "os_version": { "type": "string", "pattern": "^[0-9]+(\\.[0-9]+){0,2}$" },
+        "at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "keys": {
+      "type": "object",
+      "required": ["device_cert_fingerprint", "attest_key_id", "attest_counter", "presence_key_jkt"],
+      "additionalProperties": false,
+      "properties": {
+        "device_cert_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "attest_key_id": { "type": "string" },
+        "attest_counter": { "type": "integer", "minimum": 0 },
+        "presence_key_jkt": { "type": "string" }
+      }
+    },
+    "approved_by": { "type": "string" },
+    "approved_at": { "type": "string", "format": "date-time" }
+  }
+}

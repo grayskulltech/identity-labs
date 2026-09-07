@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grayskull.tech/castleops/contract/v1/tool.schema.json",
+  "title": "CastleOps tool registry entry",
+  "type": "object",
+  "required": ["id", "version", "kind", "domain", "description", "arguments", "result", "worker"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9_]*)+$", "description": "Dotted identifier, e.g. network.guest.provision. Also the Cedar Action id." },
+    "version": { "type": "integer", "minimum": 1 },
+    "kind": { "enum": ["read", "write", "elevate"], "description": "read executes under policy alone; write additionally requires a presence-key assertion; elevate enters the break-glass flow." },
+    "domain": { "enum": ["network", "calendar", "iot", "admin"], "description": "Selects the worker NHI." },
+    "description": { "type": "string", "maxLength": 300, "description": "Shown to the on-device model and on the confirmation card. Imperative, one sentence." },
+    "arguments": {
+      "type": "object",
+      "description": "JSON Schema (2020-12) for the arguments object. The gateway validates before policy. Free-form strings are discouraged; prefer enums and bounded integers.",
+      "required": ["type", "properties", "additionalProperties"],
+      "properties": {
+        "type": { "const": "object" },
+        "additionalProperties": { "const": false }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": ["max_bytes", "shape"],
+      "additionalProperties": false,
+      "properties": {
+        "max_bytes": { "type": "integer", "minimum": 1, "maximum": 8192, "description": "Results are compact by contract. Anything larger is summarized on the LAN before it crosses the overlay." },
+        "shape": { "enum": ["text", "summary_with_ids"] }
+      }
+    },
+    "worker": { "type": "string", "pattern": "^castleops-[a-z]+$", "description": "NHI id of the worker that executes this tool." },
+    "policy_hints": {
+      "type": "object",
+      "description": "Argument fields Cedar policy may reference as context.args.<name>. Must be a subset of arguments.properties.",
+      "additionalProperties": { "enum": ["long", "string", "bool"] }
+    }
+  }
+}

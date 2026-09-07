@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grayskull.tech/castleops/contract/v1/authz-decision.schema.json",
+  "title": "Authorization decision returned by PolicyDecisionPoint",
+  "type": "object",
+  "required": ["request_id", "decision", "determining_policies", "errors"],
+  "additionalProperties": false,
+  "properties": {
+    "request_id": { "type": "string" },
+    "decision": { "enum": ["allow", "deny"] },
+    "determining_policies": { "type": "array", "items": { "type": "string" }, "description": "Policy ids that determined the outcome. A forbid that fired is always listed." },
+    "errors": { "type": "array", "items": { "type": "string" }, "description": "Evaluation errors. Any error yields deny." },
+    "reason": { "type": "string", "maxLength": 200, "description": "Human-readable, safe to show the requester. Never includes argument values." }
+  }
+}

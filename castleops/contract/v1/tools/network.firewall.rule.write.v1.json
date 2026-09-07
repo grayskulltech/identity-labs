@@ -1,0 +1,19 @@
+{
+  "id": "network.firewall.rule.write",
+  "version": 1,
+  "kind": "elevate",
+  "domain": "network",
+  "description": "Change a firewall rule. Always requires break-glass approval.",
+  "arguments": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["rule_id", "action"],
+    "properties": {
+      "rule_id": { "type": "string", "pattern": "^fw-[0-9]{1,5}$" },
+      "action": { "type": "string", "enum": ["enable", "disable"] }
+    }
+  },
+  "result": { "max_bytes": 256, "shape": "text" },
+  "worker": "castleops-network",
+  "policy_hints": { "action": "string" }
+}

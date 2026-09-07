@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grayskull.tech/castleops/contract/v1/principal-assertion.schema.json",
+  "title": "Principal assertion produced by IdentityProvider",
+  "type": "object",
+  "required": ["subject", "groups", "issued_at", "expires_at", "auth_time", "actor_chain"],
+  "additionalProperties": false,
+  "properties": {
+    "subject": { "type": "string", "description": "Stable human subject id. Never a display name." },
+    "groups": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "auth_time": { "type": "string", "format": "date-time", "description": "When the person last authenticated with a passkey." },
+    "actor_chain": {
+      "type": "array",
+      "description": "Empty for a human token. Each RFC 8693 exchange appends one NHI id. Order is outermost first.",
+      "items": { "type": "string", "pattern": "^castleops-[a-z]+$" },
+      "maxItems": 2
+    },
+    "confirmation": {
+      "type": "object",
+      "description": "Key binding (cnf). Present on tokens bound to a device key.",
+      "additionalProperties": false,
+      "properties": {
+        "jkt": { "type": "string", "description": "JWK SHA-256 thumbprint of the bound key." }
+      }
+    },
+    "elevation": {
+      "type": "object",
+      "description": "Present only on a single-use break-glass token.",
+      "required": ["tool", "args_hash", "transaction_id", "approver"],
+      "additionalProperties": false,
+      "properties": {
+        "tool": { "type": "string" },
+        "args_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "transaction_id": { "type": "string" },
+        "approver": { "type": "string" }
+      }
+    }
+  }
+}

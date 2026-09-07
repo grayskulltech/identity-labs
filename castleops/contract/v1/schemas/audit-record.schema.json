@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grayskull.tech/castleops/contract/v1/audit-record.schema.json",
+  "title": "Audit record written by AuditSink",
+  "type": "object",
+  "required": ["request_id", "at", "subject", "device_id", "actor_chain", "tool", "args_hash", "decision", "determining_policies", "outcome"],
+  "additionalProperties": false,
+  "properties": {
+    "request_id": { "type": "string" },
+    "at": { "type": "string", "format": "date-time" },
+    "subject": { "type": "string" },
+    "device_id": { "type": "string" },
+    "actor_chain": { "type": "array", "items": { "type": "string" } },
+    "tool": { "type": "string" },
+    "tool_version": { "type": "integer" },
+    "args_hash": { "type": "string", "description": "Never the arguments themselves. Tier 3 data does not belong in a log that may be shipped." },
+    "presence_verified": { "type": "boolean" },
+    "decision": { "enum": ["allow", "deny"] },
+    "determining_policies": { "type": "array", "items": { "type": "string" } },
+    "deny_stage": { "enum": ["transport", "token", "device", "attestation", "posture", "schema", "policy", "presence", "execution", "guardrail"], "description": "Which stage denied. Absent on allow." },
+    "outcome": { "enum": ["executed", "denied", "failed", "held_for_approval"] },
+    "elevation_transaction_id": { "type": "string" },
+    "guardrail_verdict": { "enum": ["clean", "suspicious", "blocked"] }
+  }
+}
