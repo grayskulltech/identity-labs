@@ -1,0 +1,458 @@
+<title>Duo Analytics Daily Status</title>
+<meta name="color-scheme" content="dark light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* ---- tokens: dark is the designed default; light is the explicit toggle + print ---- */
+  :root {
+    color-scheme: dark;
+    --ground: #0a1220;
+    --surface: #111b2e;
+    --raised: #182540;
+    --hair: #26344f;
+    --hair-strong: #35466a;
+    --ink: #e6edf7;
+    --ink-2: #a5b3c8;
+    --muted: #6d7d96;
+    --accent: #ffd23f;          /* ADA yellow: 12.7:1 on ground */
+    --accent-ink: #ffd23f;
+    --accent-wash: rgba(255, 210, 63, 0.10);
+    --err: #f2545b;
+    --warn: #f08a24;
+    --ok: #27a86c;
+    --info: #4c8dff;
+    --err-wash: rgba(242, 84, 91, 0.14);
+    --warn-wash: rgba(240, 138, 36, 0.14);
+    --ok-wash: rgba(39, 168, 108, 0.14);
+    --info-wash: rgba(76, 141, 255, 0.14);
+    --code-bg: #0c1526;
+    --shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --ground: #f3f5f9;
+    --surface: #ffffff;
+    --raised: #f7f9fc;
+    --hair: #dfe5ee;
+    --hair-strong: #c5cfdd;
+    --ink: #0f1a2b;
+    --ink-2: #3f4d63;
+    --muted: #6b7890;
+    --accent: #ffd23f;
+    --accent-ink: #6f5300;
+    --accent-wash: rgba(255, 210, 63, 0.28);
+    --err: #c62f36;
+    --warn: #b85f06;
+    --ok: #1a7f4f;
+    --info: #2160c4;
+    --err-wash: rgba(198, 47, 54, 0.10);
+    --warn-wash: rgba(184, 95, 6, 0.10);
+    --ok-wash: rgba(26, 127, 79, 0.10);
+    --info-wash: rgba(33, 96, 196, 0.10);
+    --code-bg: #eef2f8;
+    --shadow: none;
+  }
+  @media print {
+    :root {
+      color-scheme: light;
+      --ground: #ffffff; --surface: #ffffff; --raised: #f7f9fc; --hair: #d5dce7; --hair-strong: #b8c2d2;
+      --ink: #0f1a2b; --ink-2: #3f4d63; --muted: #6b7890;
+      --accent: #ffd23f; --accent-ink: #6f5300; --accent-wash: rgba(255,210,63,0.28);
+      --err: #c62f36; --warn: #b85f06; --ok: #1a7f4f; --info: #2160c4;
+      --err-wash: rgba(198,47,54,0.10); --warn-wash: rgba(184,95,6,0.10); --ok-wash: rgba(26,127,79,0.10); --info-wash: rgba(33,96,196,0.10);
+      --code-bg: #f1f4f9; --shadow: none;
+    }
+    details { break-inside: avoid; }
+    details > * { display: block; }
+    .toolbar { display: none; }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  a { color: var(--accent-ink); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .page { max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; display: grid; gap: 40px; }
+  @media (max-width: 640px) { .page { padding: 20px 14px 48px; gap: 28px; } }
+
+  /* ---- masthead ---- */
+  .mast { display: grid; gap: 18px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
+  h1 { margin: 0; font-size: 30px; line-height: 1.15; font-weight: 600; text-wrap: balance; }
+  .mast-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 32px; }
+  .meta { color: var(--ink-2); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .meta .mono { color: var(--muted); }
+
+  .overall {
+    display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 6px;
+    font-weight: 600; letter-spacing: .04em; font-size: 14px; text-transform: uppercase;
+  }
+  .overall.RED { background: var(--err-wash); color: var(--err); box-shadow: inset 0 0 0 1px var(--err); }
+  .overall.AMBER { background: var(--warn-wash); color: var(--warn); box-shadow: inset 0 0 0 1px var(--warn); }
+  .overall.GREEN { background: var(--ok-wash); color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+
+  /* ---- fleet strip ---- */
+  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--hair); border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; }
+  .tile { background: var(--surface); padding: 16px 18px; display: grid; gap: 6px; align-content: start; }
+  .tile .label { font-size: 12px; color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
+  .tile .value { font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .tile .sub { font-size: 13px; color: var(--muted); }
+  .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--ground); margin-top: 6px; }
+  .bar span { display: block; height: 100%; }
+  .bar .ok { background: var(--ok); } .bar .warn { background: var(--warn); } .bar .err { background: var(--err); }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
+  .legend b { font-weight: 600; color: var(--ink); }
+
+  /* ---- sections ---- */
+  section { display: grid; gap: 16px; }
+  h2 { margin: 0; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; display: flex; align-items: baseline; gap: 12px; }
+  h2 small { color: var(--muted); letter-spacing: 0; text-transform: none; font-weight: 400; font-size: 13px; }
+  h3 { margin: 0; font-size: 16px; font-weight: 600; }
+  .lede { color: var(--ink-2); max-width: 68ch; margin: 0; }
+
+  /* ---- status chip: color + glyph + word, never color alone ---- */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px;
+    font-size: 11.5px; font-weight: 600; letter-spacing: .06em; white-space: nowrap; line-height: 1.5;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  .chip .g { font-size: 9px; }
+  .chip.RED { background: var(--err-wash); color: var(--err); }
+  .chip.AMBER { background: var(--warn-wash); color: var(--warn); }
+  .chip.GREEN { background: var(--ok-wash); color: var(--ok); }
+  .chip.INFO { background: var(--info-wash); color: var(--info); }
+
+  /* ---- action queue ---- */
+  .queue { display: grid; gap: 12px; counter-reset: act; }
+  .act {
+    display: grid; grid-template-columns: 44px 1fr; gap: 0 16px; background: var(--surface);
+    border: 1px solid var(--hair); border-left: 3px solid var(--hair-strong); border-radius: 6px; padding: 16px 18px 16px 14px;
+  }
+  .act.RED { border-left-color: var(--err); } .act.AMBER { border-left-color: var(--warn); } .act.INFO { border-left-color: var(--info); }
+  .act .n { font-family: "IBM Plex Mono", monospace; font-size: 22px; font-weight: 500; color: var(--accent-ink); line-height: 1.1; }
+  .act .body { display: grid; gap: 8px; min-width: 0; }
+  .act .head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .act .why { color: var(--ink-2); margin: 0; max-width: 78ch; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-2); background: var(--raised); border: 1px solid var(--hair); border-radius: 4px; padding: 1px 7px; }
+  pre.cmd {
+    margin: 4px 0 0; background: var(--code-bg); border: 1px solid var(--hair); border-radius: 6px; padding: 10px 12px;
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px; line-height: 1.6; color: var(--ink); overflow-x: auto; white-space: pre;
+  }
+  pre.cmd .c { color: var(--muted); }
+
+  /* ---- stream matrix ---- */
+  .scroll { overflow-x: auto; border: 1px solid var(--hair); border-radius: 8px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  th { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; background: var(--raised); white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tr.group td { background: var(--raised); color: var(--muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 6px 12px; }
+  td.tenant { min-width: 190px; }
+  td.tenant .name { font-weight: 600; }
+  td.tenant .slug { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); }
+  td.cell { min-width: 150px; }
+  .cell .s, .cell .cp { white-space: nowrap; }
+  .cell .v { display: flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace; font-size: 14px; font-weight: 500; }
+  .cell .v .g { font-size: 10px; }
+  .cell .v.RED { color: var(--err); } .cell .v.AMBER { color: var(--warn); } .cell .v.GREEN { color: var(--ok); } .cell .v.INFO { color: var(--info); }
+  .cell .s { font-size: 12px; color: var(--muted); }
+  .cell .cp { font-size: 12px; color: var(--warn); }
+  .matrix-legend { font-size: 12.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .matrix-legend .mono { color: var(--ink); }
+
+  /* ---- tenant detail ---- */
+  .toolbar { display: flex; gap: 8px; justify-content: flex-end; }
+  button.ghost { background: transparent; color: var(--ink-2); border: 1px solid var(--hair-strong); border-radius: 4px; padding: 5px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  button.ghost:hover { color: var(--ink); border-color: var(--accent); }
+  details.tenant { background: var(--surface); border: 1px solid var(--hair); border-radius: 8px; }
+  details.tenant + details.tenant { margin-top: 10px; }
+  details.tenant > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr auto; gap: 8px 16px; align-items: center; }
+  details.tenant > summary::-webkit-details-marker { display: none; }
+  details.tenant > summary .who { display: grid; gap: 2px; min-width: 0; }
+  details.tenant > summary .who .name { font-weight: 600; }
+  details.tenant > summary .who .headline { font-size: 13px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  details.tenant > summary .counts { display: flex; gap: 6px; }
+  details.tenant > summary .caret { color: var(--muted); font-size: 12px; transition: transform .15s; }
+  details.tenant[open] > summary .caret { transform: rotate(90deg); }
+  @media (max-width: 640px) { details.tenant > summary { grid-template-columns: auto 1fr; } details.tenant > summary .counts { grid-column: 1 / -1; } }
+  .tbody { border-top: 1px solid var(--hair); padding: 16px 18px 18px; display: grid; gap: 20px; }
+  .issues { display: grid; gap: 0; border: 1px solid var(--hair); border-radius: 6px; overflow: hidden; }
+  .issue { display: grid; grid-template-columns: 78px 200px 1fr; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--hair); align-items: baseline; font-size: 13.5px; }
+  .issue:last-child { border-bottom: 0; }
+  .issue .check { font-weight: 500; }
+  .issue .text { color: var(--ink-2); }
+  @media (max-width: 640px) { .issue { grid-template-columns: 78px 1fr; } .issue .text { grid-column: 2; } }
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px 16px; }
+  .fact { display: grid; gap: 2px; }
+  .fact .k { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fact .v { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
+  .fact .v small { color: var(--muted); font-size: 12px; }
+  .okline { font-size: 12.5px; color: var(--muted); }
+  .okline b { color: var(--ink-2); font-weight: 500; }
+  .frameworks { font-size: 12.5px; color: var(--muted); }
+
+  /* ---- fleet facts ---- */
+  .facts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--hair); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; align-content: start; }
+  .card h3 { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13.5px; align-items: baseline; }
+  .kv .k { color: var(--muted); }
+  .containers { display: grid; gap: 6px; font-size: 13px; }
+  .containers .row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+  .containers .row .mono { color: var(--ink-2); font-size: 12.5px; }
+
+  footer { color: var(--muted); font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; border-top: 1px solid var(--hair); padding-top: 16px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+{% macro chip(status) -%}
+<span class="chip {{ status }}"><span class="g" aria-hidden="true">{{ status|glyph }}</span>{{ status|sev }}</span>
+{%- endmacro %}
+
+{% macro cell(c) -%}
+<td class="cell">
+  <div class="v {{ c.status }}"><span class="g" aria-hidden="true">{{ c.status|glyph }}</span>{{ c.primary }}<span class="sr" hidden>{{ c.status|sev }}</span></div>
+  {% if c.secondary %}<div class="s">{{ c.secondary }}</div>{% endif %}
+  {% if c.limit %}<div class="s">{{ c.limit }}</div>{% endif %}
+  {% if c.checkpoint_note %}<div class="cp">{{ c.checkpoint_note }}</div>{% endif %}
+</td>
+{%- endmacro %}
+
+<div class="page">
+
+  <header class="mast">
+    <div class="eyebrow">{{ m.report.product }} · {{ m.report.kind }}</div>
+    <div class="mast-row">
+      <h1>{{ m.report.date_long }}</h1>
+      <div class="overall {{ m.report.overall }}"><span aria-hidden="true">{{ m.report.overall|glyph }}</span> Fleet {{ m.report.overall|sev }}</div>
+    </div>
+    <div class="meta">
+      <span>Run {{ m.report.time_utc }}</span>
+      <span>Collected in {{ m.report.collect_seconds|duration }}, {{ m.report.collector_errors }} collector errors</span>
+      <span>Host <span class="mono">{{ m.fleet.infra.host }}</span></span>
+      <span class="mono">{{ m.report.run_id }}</span>
+    </div>
+    <div class="strip">
+      <div class="tile">
+        <div class="label">Customer tenants</div>
+        <div class="value">{{ m.customer_tenants|length }}</div>
+        <div class="sub">{{ m.summary.tenants_red }} err · {{ m.summary.tenants_amber }} warn · {{ m.summary.tenants_green }} ok</div>
+        {% if m.summary.nonprod_tenants %}<div class="sub">+ {{ m.summary.nonprod_tenants }} lab/non-prod ({{ m.summary.nonprod_red }} err · {{ m.summary.nonprod_amber }} warn), excluded from fleet status</div>{% endif %}
+      </div>
+      <div class="tile">
+        <div class="label">Checks</div>
+        <div class="value">{{ m.summary.total }}</div>
+        <div class="bar" role="img" aria-label="{{ m.summary.ok }} ok, {{ m.summary.warn }} warn, {{ m.summary.err }} err">
+          <span class="ok" style="flex: {{ m.summary.ok }}"></span><span class="warn" style="flex: {{ m.summary.warn }}"></span><span class="err" style="flex: {{ m.summary.err }}"></span>
+        </div>
+        <div class="legend"><span><b>{{ m.summary.ok }}</b> ok</span><span><b>{{ m.summary.warn }}</b> warn</span><span><b>{{ m.summary.err }}</b> err</span>{% if m.summary.retired %}<span><b>{{ m.summary.retired }}</b> retired</span>{% endif %}</div>
+      </div>
+      <div class="tile">
+        <div class="label">Actions today</div>
+        <div class="value">{{ m.actions|selectattr('severity', 'in', ['RED', 'AMBER'])|list|length }}</div>
+        <div class="sub">{{ m.actions|selectattr('severity', 'equalto', 'INFO')|list|length }} more to note, no action</div>
+      </div>
+      <div class="tile">
+        <div class="label">Duo service</div>
+        <div class="value" style="font-size: 20px; padding-top: 4px;">{{ chip(m.fleet.duo_status.status) }}</div>
+        <div class="sub">{{ m.fleet.duo_status.note }} · {{ m.fleet.duo_releases_7d }} release{{ 's' if m.fleet.duo_releases_7d != 1 }} in 7d ({{ m.fleet.latest_release }})</div>
+      </div>
+    </div>
+  </header>
+
+  <section id="today">
+    <h2>Do today <small>ordered by impact, one runbook each</small></h2>
+    <div class="queue">
+      {% for a in m.actions %}
+      <article class="act {{ a.severity }}">
+        <div class="n">{{ '%02d' % a.n }}</div>
+        <div class="body">
+          <div class="head">{{ chip(a.severity) }}<h3>{{ a.title }}</h3></div>
+          <p class="why">{{ a.why }}</p>
+          <div class="tags">{% for s in a.tenants %}<span class="tag">{{ s }}</span>{% endfor %}</div>
+          {% if a.commands %}
+          <pre class="cmd">{% for c in a.commands %}{% if c.note %}<span class="c"># {{ c.note }}</span>
+{% endif %}{{ c.cmd }}{{ '\n' if not loop.last }}{% endfor %}</pre>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="streams">
+    <h2>Streams <small>age of the newest row per stream, worst of freshness and 24h ingest</small></h2>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Tenant</th>
+            {% for key, label, _ in STREAMS %}<th>{{ label }}</th>{% endfor %}
+            <th>API pull</th>
+            <th>Staging</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group"><td colspan="{{ STREAMS|length + 3 }}">Customer tenants</td></tr>
+          {% for t in m.customer_tenants %}
+          <tr>
+            <td class="tenant"><div class="name">{{ t.name }}</div><div class="slug">{{ t.slug }} · {{ t.edition }}</div></td>
+            {% for key, _, _ in STREAMS %}{{ cell(t.cells[key]) }}{% endfor %}
+            {{ cell(t.pull_cell) }}
+            {{ cell(t.drift_cell) }}
+          </tr>
+          {% endfor %}
+          <tr class="group"><td colspan="{{ STREAMS|length + 3 }}">Lab &amp; non-production tenants — excluded from fleet status</td></tr>
+          {% for t in m.nonprod_tenants %}
+          <tr>
+            <td class="tenant"><div class="name">{{ t.name }}</div><div class="slug">{{ t.slug }} · {{ t.edition }}</div></td>
+            {% for key, _, _ in STREAMS %}{{ cell(t.cells[key]) }}{% endfor %}
+            {{ cell(t.pull_cell) }}
+            {{ cell(t.drift_cell) }}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="matrix-legend">
+      <span><span class="mono">■</span> err</span>
+      <span><span class="mono">▲</span> warn</span>
+      <span><span class="mono">●</span> ok</span>
+      <span>Second line: rows landed in the last 24h and the freshness limit where one applies.</span>
+      <span>Orange note: the DLS checkpoint file is older than 7 days or missing, so DLS is not the source of what did arrive.</span>
+      {% if DEPRECATED %}<span>Retired: {{ DEPRECATED|join(', ') }} ({{ m.summary.retired }} checks dropped from the counts; the stream is deprecated in Duo).</span>{% endif %}
+    </div>
+  </section>
+
+  <section id="tenants">
+    <h2>Tenant detail <small>exceptions only; healthy checks are counted, not listed</small></h2>
+    <div class="toolbar">
+      <button class="ghost" type="button" data-toggle="open">Expand all</button>
+      <button class="ghost" type="button" data-toggle="close">Collapse all</button>
+    </div>
+    <div>
+    {% for t in m.tenants %}
+    <details class="tenant" id="t-{{ t.slug }}">
+      <summary>
+        {{ chip(t.status) }}
+        <div class="who">
+          <div class="name">{{ t.name }} <span class="mono" style="font-weight:400;color:var(--muted);font-size:12px">{{ t.slug }} · {{ t.account }} · {{ t.edition }}</span></div>
+          <div class="headline">{{ t.headline }}</div>
+        </div>
+        <div class="counts">
+          {% if t.err %}<span class="chip RED">{{ t.err }} err</span>{% endif %}
+          {% if t.warn %}<span class="chip AMBER">{{ t.warn }} warn</span>{% endif %}
+          <span class="caret" aria-hidden="true">▶</span>
+        </div>
+      </summary>
+      <div class="tbody">
+        {% if t.issues %}
+        <div class="issues">
+          {% for i in t.issues %}
+          <div class="issue">{{ chip(i.status) }}<div class="check">{{ i.check }}</div><div class="text">{{ i.text }}</div></div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="facts">
+          <div class="fact"><div class="k">Active users</div><div class="v">{{ t.cost.active_users|int }}</div></div>
+          <div class="fact"><div class="k">Directory</div><div class="v">{{ t.security.users|int }} <small>users</small> · {{ t.security.admins|int }} <small>admins</small></div></div>
+          <div class="fact"><div class="k">Admin actions 24h</div><div class="v">{{ t.security.admin_actions_24h|int }}</div></div>
+          <div class="fact"><div class="k">Bypass codes</div><div class="v">{{ t.security.bypass_codes }} <small>of {{ t.security.bypass_threshold }}</small></div></div>
+          <div class="fact"><div class="k">Telephony 24h</div><div class="v">{{ t.cost.credits_24h|int }} <small>credits · {{ t.cost.telephony_txns_24h|int }} txns</small></div></div>
+          <div class="fact"><div class="k">Credit balance</div><div class="v">{{ t.security.telephony_credits|compact }}</div></div>
+          <div class="fact"><div class="k">Database</div><div class="v">{{ t.db.size_mb|mb }} <small>WAL {{ t.db.wal_mb|mb }}</small></div></div>
+          <div class="fact"><div class="k">Data gaps 30d</div><div class="v">{{ t.quality.gap_days_30d }} <small>days</small></div></div>
+          <div class="fact"><div class="k">Field shapes 24h</div><div class="v">{{ t.quality.shapes_24h|int }}</div></div>
+          <div class="fact"><div class="k">Snapshot</div><div class="v">{{ t.security.snapshot_at|ts }}</div></div>
+          {% for k, v in t.slo.items() %}
+          <div class="fact"><div class="k">SLO {{ k|human }}</div>
+            <div class="v">{% if v.warming %}<small>warming up · target {{ v.target }}%</small>{% else %}{{ '%.1f' % v.pct }}% <small>/ {{ v.samples }} samples</small>{% endif %}</div></div>
+          {% endfor %}
+        </div>
+        <div class="okline"><b>Healthy:</b> {{ t.healthy|join(', ') if t.healthy else 'nothing else passed' }}.
+          Change log: {{ t.change_summary }}. {{ 'No deploys to main in 24h.' if t.changes.deploys_24h == 0 else '' }}</div>
+        <div class="frameworks">Frameworks in scope: {{ t.frameworks|join(', ') }}</div>
+      </div>
+    </details>
+    {% endfor %}
+    </div>
+  </section>
+
+  <section id="fleet">
+    <h2>Report host <small>{{ m.fleet.infra.host }}</small></h2>
+    <div class="facts-grid">
+      <div class="card">
+        <h3>DLS containers</h3>
+        <div class="containers">
+          {% for c in m.fleet.infra.containers %}
+          <div class="row"><span class="mono">{{ c.name }}</span><span class="mono">up {{ c.uptime }}</span>{{ chip('GREEN' if c.health == 'healthy' else 'AMBER') }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card">
+        <h3>Host</h3>
+        <div class="kv">
+          <span class="k">Disk {{ m.fleet.infra.disk.volume }}</span><span>{{ m.fleet.infra.disk.free_gb }} GB free of {{ m.fleet.infra.disk.total_gb }} GB ({{ m.fleet.infra.disk.pct_free }}%)</span>
+          <span class="k">Scheduler</span><span>{{ chip('AMBER') }} {{ m.fleet.infra.scheduler.note }}. Zero tasks is not a pass, it is a blind spot.</span>
+          {% if m.fleet.infra.nssm %}<span class="k">Service</span><span>{{ chip('INFO') }} {{ m.fleet.infra.nssm.note }}</span>{% endif %}
+          <span class="k">Deploys</span><span>{{ 'no commits to main in 24h' if m.fleet.deploys_24h == 0 else m.fleet.deploys_24h ~ ' in 24h' }}</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Runbook</h3>
+        <div class="kv">
+          <span class="k">Restart DLS</span><code>{{ RUNBOOK.dls_restart.replace('{slug}', '<slug>') }}</code>
+          <span class="k">Recreate DLS</span><code>{{ RUNBOOK.dls_recreate.replace('{slug}', '<slug>') }}</code>
+          <span class="k">Pull logs</span><code>{{ RUNBOOK.pull_stream.replace('{slug}', '<slug>').replace('{streams}', 'auth | telephony') }}</code>
+          <span class="k">Pull admin</span><code>{{ RUNBOOK.pull_admin.replace('{slug}', '<slug>') }}</code>
+          <span class="k">Fix drift</span><code>{{ RUNBOOK.drift_fix.replace('{slug}', '<slug>') }}</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% if m.offboarded_tenants %}
+  <section id="offboarded">
+    <h2>Offboarded <small>excluded from every check above — kept here for the audit trail, not the fleet verdict</small></h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Tenant</th><th>Slug</th><th>Offboarded</th><th>Reason</th></tr></thead>
+        <tbody>
+          {% for t in m.offboarded_tenants %}
+          <tr>
+            <td>{{ t.name }}</td>
+            <td class="mono">{{ t.slug }}</td>
+            <td class="mono">{{ t.offboarded_at|ts if t.offboarded_at else '—' }}</td>
+            <td>{{ t.offboarded_reason or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  <footer>
+    <span>{{ m.report.product }} · {{ m.report.date }} {{ m.report.time_utc }}</span>
+    <span class="mono">{{ m.report.run_id }}</span>
+    {% if m.report.confidential %}<span>Confidential</span>{% endif %}
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('[data-toggle]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('data-toggle') === 'open';
+      document.querySelectorAll('details.tenant').forEach(function (d) { d.open = open; });
+    });
+  });
+  if (location.hash) { var el = document.querySelector(location.hash); if (el && el.tagName === 'DETAILS') el.open = true; }
+</script>

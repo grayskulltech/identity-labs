@@ -1,0 +1,122 @@
+<title>{{ m.report.subject }}</title>
+<!-- This is an HTML EMAIL BODY: table layout, inline styles throughout, no
+     CSS grid/flex, no custom properties. Outlook's Word rendering engine
+     ignores <style> blocks and modern CSS, so every rule that matters is
+     inlined on the element. The <style> block below is a light enhancement
+     for clients that do support prefers-color-scheme (Apple Mail, Gmail
+     app/web, Outlook.com) — the inline styles are the correct baseline on
+     every client, dark-mode included, since dark-mode clients that ignore
+     <style> also darken light backgrounds automatically. -->
+<style>
+  @media (prefers-color-scheme: dark) {
+    .bg { background:#1a1a1a !important; }
+    .card { background:#242424 !important; border-color:#3a3a3a !important; }
+    .ink { color:#ececec !important; }
+    .ink2 { color:#b8b8b8 !important; }
+    .muted { color:#8a8a8a !important; }
+    .hair { border-color:#3a3a3a !important; }
+  }
+</style>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="bg" style="background:#f2f2f0;">
+<tr><td align="center" style="padding:28px 16px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" class="card"
+       style="width:600px;max-width:100%;background:#ffffff;border:1px solid #dcdcd6;border-radius:6px;font-family:Arial,Helvetica,sans-serif;">
+
+  <!-- header -->
+  <tr><td style="padding:22px 28px 18px;">
+    <div class="muted" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8a8a86;">
+      Duo Analytics &middot; Daily Status
+    </div>
+    <div class="ink" style="font-size:19px;line-height:1.3;font-weight:700;color:#1a1a18;margin-top:5px;">
+      {{ m.report.date_long }}
+    </div>
+  </td></tr>
+
+  <!-- verdict -->
+  <tr><td class="hair" style="padding:0 28px 20px;border-bottom:1px solid #e6e6e1;">
+    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+      <td style="background:{{ {'RED':'#fbeceb','AMBER':'#fdf1e3','GREEN':'#eaf5ee'}[m.report.overall] }};
+                 border:1px solid {{ {'RED':'#c62f36','AMBER':'#b85f06','GREEN':'#1a7f4f'}[m.report.overall] }};
+                 border-radius:3px;padding:3px 9px;">
+        <span style="font-family:'Courier New',Courier,monospace;font-size:12px;font-weight:700;letter-spacing:.03em;
+                     color:{{ {'RED':'#c62f36','AMBER':'#b85f06','GREEN':'#1a7f4f'}[m.report.overall] }};">
+          {{ m.report.overall|sev }}
+        </span>
+      </td>
+      <td class="ink" style="padding-left:10px;font-size:14.5px;font-weight:600;color:#1a1a18;">
+        {% if m.summary.tenants_red + m.summary.tenants_amber == 0 %}
+          All {{ m.customer_tenants|length }} customer tenants OK
+        {% else %}
+          {{ m.summary.tenants_red + m.summary.tenants_amber }} of {{ m.customer_tenants|length }} customer tenant{{ 's' if m.customer_tenants|length != 1 }} need action
+        {% endif %}
+      </td>
+    </tr></table>
+    <p class="ink2" style="font-size:13px;line-height:1.55;color:#55554f;margin:12px 0 0;">
+      {{ m.summary.tenants_red }} err, {{ m.summary.tenants_amber }} warn across customer tenants.
+      {% if m.summary.nonprod_tenants %}{{ m.summary.nonprod_tenants }} lab/non-production tenant{{ 's' if m.summary.nonprod_tenants != 1 }}
+      ({{ m.summary.nonprod_red }} err, {{ m.summary.nonprod_amber }} warn) excluded from this status.{% endif %}
+    </p>
+  </td></tr>
+
+  {% if m.email_rows %}
+  <!-- customer action rows -->
+  <tr><td style="padding:4px 28px 4px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+      {% for a in m.email_rows %}
+      <tr class="hair" style="border-top:1px solid #eeeeea;">
+        <td style="padding:12px 10px 12px 0;width:46px;vertical-align:top;">
+          <span style="font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:700;
+                       color:{{ {'RED':'#c62f36','AMBER':'#b85f06'}[a.severity] }};">{{ a.severity|sev }}</span>
+        </td>
+        <td style="padding:12px 0;vertical-align:top;">
+          <div class="ink" style="font-size:13.5px;font-weight:600;color:#1a1a18;">{{ a.title }}</div>
+          <div class="ink2" style="font-size:12.5px;line-height:1.5;color:#68685f;margin-top:2px;">{{ a.why|first_sentence }}</div>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </td></tr>
+  {% endif %}
+
+  {% if m.email_rows_nonprod or m.email_info_count %}
+  <tr><td class="hair" style="padding:2px 28px 16px;border-top:1px solid #eeeeea;margin-top:8px;">
+    <p class="muted" style="font-size:12px;line-height:1.5;color:#8a8a86;margin:14px 0 0;">
+      {% if m.email_rows_nonprod %}{{ m.email_rows_nonprod|length }} more open item{{ 's' if m.email_rows_nonprod|length != 1 }}
+      on lab/non-production tenants{% endif %}{% if m.email_rows_nonprod and m.email_info_count %}; {% endif -%}
+      {%- if m.email_info_count %}{{ m.email_info_count }} informational note{{ 's' if m.email_info_count != 1 }}{% endif %}
+      &mdash; see the full report.
+    </p>
+  </td></tr>
+  {% endif %}
+
+  <!-- action link -->
+  <tr><td class="hair" style="padding:18px 28px;border-top:1px solid #e6e6e1;">
+    {% if m.report.full_report_url %}
+    <a href="{{ m.report.full_report_url }}" style="font-size:13px;font-weight:600;color:#1c5cab;text-decoration:none;">
+      View full report &amp; recovery commands &rarr;
+    </a>
+    {% else %}
+    <span class="muted" style="font-size:12.5px;color:#8a8a86;">Recovery commands: run <code style="font-family:'Courier New',Courier,monospace;">render.py --style full</code> for the full report.</span>
+    {% endif %}
+  </td></tr>
+
+  {% if m.offboarded_tenants %}
+  <tr><td class="hair" style="padding:2px 28px 16px;border-top:1px solid #eeeeea;">
+    <p class="muted" style="font-size:11px;line-height:1.5;color:#9a9a94;margin:14px 0 0;">
+      Excluded (offboarded): {{ m.offboarded_tenants|map(attribute='name')|join(', ') }}.
+    </p>
+  </td></tr>
+  {% endif %}
+
+  <!-- footer -->
+  <tr><td class="hair" style="padding:14px 28px 20px;border-top:1px solid #e6e6e1;">
+    <p class="muted" style="font-size:11px;line-height:1.5;color:#9a9a94;margin:0;">
+      Run {{ m.report.time_utc }} &middot; <span style="font-family:'Courier New',Courier,monospace;">{{ m.report.run_id }}</span>
+      {%- if m.report.confidential %} &middot; Confidential{% endif %}
+    </p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
