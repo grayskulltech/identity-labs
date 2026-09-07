@@ -12,7 +12,7 @@
   "date_long": "Sunday 6 September 2026",
   "date_short": "Sep 06, 2026",
   "time_utc": "11:00 UTC",
-  "subject": "Duo Analytics [ERR] 4 customer tenants need action \u2014 Sep 06, 2026"
+  "subject": "Duo Analytics [ERR] 3 customer tenants need action \u2014 Sep 06, 2026"
  },
  "summary": {
   "tenants": 8,
@@ -21,7 +21,7 @@
   "err": 21,
   "retired": 32,
   "total": 163,
-  "tenants_red": 4,
+  "tenants_red": 3,
   "tenants_amber": 0,
   "tenants_green": 0,
   "nonprod_tenants": 4,
@@ -307,6 +307,9 @@
     "HITECH",
     "HITRUST_CSF"
    ],
+   "offboarded": true,
+   "offboarded_at": "2026-09-07T00:00:00Z",
+   "offboarded_reason": "contract ended \u2014 no longer in book of business",
    "nonprod": false,
    "cells": {
     "auth": {
@@ -605,6 +608,7 @@
     "HITECH",
     "HITRUST_CSF"
    ],
+   "offboarded": false,
    "nonprod": false,
    "cells": {
     "auth": {
@@ -848,6 +852,7 @@
     "HITECH",
     "HITRUST_CSF"
    ],
+   "offboarded": false,
    "nonprod": false,
    "cells": {
     "auth": {
@@ -1114,6 +1119,7 @@
     "SOC2",
     "CIS_Controls_v8"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -1397,6 +1403,7 @@
     "SOC2",
     "CIS_Controls_v8"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -1703,6 +1710,7 @@
     "SOC2",
     "CIS_Controls_v8"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -1994,6 +2002,7 @@
     "HITRUST_CSF",
     "NIST_CSF_2.0"
    ],
+   "offboarded": false,
    "nonprod": false,
    "cells": {
     "auth": {
@@ -2254,6 +2263,7 @@
     "HITRUST_CSF",
     "NIST_CSF_2.0"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -2350,263 +2360,7 @@
    "change_summary": "n/a 1, proposed 18"
   }
  ],
- "actions": [
-  {
-   "severity": "RED",
-   "group": "stream",
-   "nonprod": false,
-   "title": "Customer A: Telephony, Admin stalled",
-   "why": "Telephony, Admin stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d), so DLS has not written those streams in a long time and the API pull has been the real source.",
-   "tenants": [
-    "tenant-a"
-   ],
-   "commands": [
-    {
-     "cmd": "docker restart tenant-a-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-a-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "set DUO_TENANT_SLUG=tenant-a && python pull.py --logs-only   # streams: telephony",
-     "note": "backfill while DLS catches up"
-    },
-    {
-     "cmd": "python pull_activity.py --tenant tenant-a",
-     "note": null
-    }
-   ],
-   "n": 1
-  },
-  {
-   "severity": "RED",
-   "group": "stream",
-   "nonprod": false,
-   "title": "Customer B: Telephony stalled",
-   "why": "Telephony stopped arriving while auth is still flowing, so the container is alive but this stream is dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
-   "tenants": [
-    "tenant-b"
-   ],
-   "commands": [
-    {
-     "cmd": "docker restart tenant-b-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-b-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "set DUO_TENANT_SLUG=tenant-b && python pull.py --logs-only   # streams: telephony",
-     "note": "backfill while DLS catches up"
-    }
-   ],
-   "n": 2
-  },
-  {
-   "severity": "RED",
-   "group": "stream",
-   "nonprod": false,
-   "title": "Customer C: Admin stalled",
-   "why": "Admin stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.",
-   "tenants": [
-    "tenant-c"
-   ],
-   "commands": [
-    {
-     "cmd": "docker restart tenant-c-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-c-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "python pull_activity.py --tenant tenant-c",
-     "note": null
-    }
-   ],
-   "n": 3
-  },
-  {
-   "severity": "RED",
-   "group": "stream",
-   "nonprod": true,
-   "title": "Lab Tenant B (Advantage): Auth, Telephony, Admin not flowing",
-   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.",
-   "tenants": [
-    "lab-b"
-   ],
-   "commands": [
-    {
-     "cmd": "python schema_drift.py --tenant lab-b --apply",
-     "note": "first: unblock the merge"
-    },
-    {
-     "cmd": "docker restart lab-b-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-b-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "set DUO_TENANT_SLUG=lab-b && python pull.py --logs-only   # streams: auth, telephony",
-     "note": "backfill while DLS catches up"
-    },
-    {
-     "cmd": "python pull_activity.py --tenant lab-b",
-     "note": null
-    }
-   ],
-   "n": 4
-  },
-  {
-   "severity": "RED",
-   "group": "stream",
-   "nonprod": true,
-   "title": "Lab Tenant C (Essentials): Auth, Telephony, Admin not flowing",
-   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.",
-   "tenants": [
-    "lab-c"
-   ],
-   "commands": [
-    {
-     "cmd": "python schema_drift.py --tenant lab-c --apply",
-     "note": "first: unblock the merge"
-    },
-    {
-     "cmd": "docker restart lab-c-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-c-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "set DUO_TENANT_SLUG=lab-c && python pull.py --logs-only   # streams: auth, telephony",
-     "note": "backfill while DLS catches up"
-    },
-    {
-     "cmd": "python pull_activity.py --tenant lab-c",
-     "note": null
-    }
-   ],
-   "n": 5
-  },
-  {
-   "severity": "AMBER",
-   "group": "pull",
-   "title": "API pull has not completed in over 24h for 3 tenants",
-   "why": "The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report's scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.",
-   "tenants": [
-    "tenant-c",
-    "lab-a",
-    "lab-b"
-   ],
-   "nonprod": false,
-   "commands": [
-    {
-     "cmd": "schtasks /Query /FO LIST /V | findstr /I \"Duo-Analytics\"",
-     "note": "on the report host"
-    },
-    {
-     "cmd": "nssm status Duo-Analytics",
-     "note": null
-    }
-   ],
-   "n": 6
-  },
-  {
-   "severity": "AMBER",
-   "group": "stream",
-   "nonprod": true,
-   "title": "Lab Tenant A (Premier): Auth, Telephony stalled",
-   "why": "Auth, Telephony stopped arriving. DLS checkpoints are old (Telephony 51d), so DLS has not written those streams in a long time and the API pull has been the real source.",
-   "tenants": [
-    "lab-a"
-   ],
-   "commands": [
-    {
-     "cmd": "docker restart lab-a-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-a-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "set DUO_TENANT_SLUG=lab-a && python pull.py --logs-only   # streams: auth, telephony",
-     "note": "backfill while DLS catches up"
-    }
-   ],
-   "n": 7
-  },
-  {
-   "severity": "AMBER",
-   "group": "stream",
-   "nonprod": true,
-   "title": "Customer E (Non-Production): Auth, Telephony, Admin stalled",
-   "why": "Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
-   "tenants": [
-    "tenant-e"
-   ],
-   "commands": [
-    {
-     "cmd": "docker restart tenant-e-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "set DUO_TENANT_SLUG=tenant-e && python pull.py --logs-only   # streams: auth, telephony",
-     "note": "backfill while DLS catches up"
-    },
-    {
-     "cmd": "python pull_activity.py --tenant tenant-e",
-     "note": null
-    }
-   ],
-   "n": 8
-  },
-  {
-   "severity": "INFO",
-   "group": "infra",
-   "nonprod": false,
-   "title": "3 containers restarted just before this run",
-   "why": "tenant-a-duologsync up 52 seconds, lab-c-duologsync up about a minute, tenant-d-duologsync up about a minute. Health is still 'starting', so today's freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.",
-   "tenants": [
-    "tenant-a",
-    "lab-c",
-    "tenant-d"
-   ],
-   "commands": [],
-   "n": 9
-  },
-  {
-   "severity": "INFO",
-   "group": "report",
-   "nonprod": false,
-   "title": "SLO history exists for only 1 of 8 tenants",
-   "why": "Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.",
-   "tenants": [
-    "tenant-b",
-    "tenant-c",
-    "lab-a",
-    "lab-b",
-    "lab-c",
-    "tenant-d",
-    "tenant-e"
-   ],
-   "commands": [],
-   "n": 10
-  }
- ],
- "customer_tenants": [
+ "offboarded_tenants": [
   {
    "slug": "tenant-a",
    "name": "Customer A",
@@ -2807,6 +2561,9 @@
     "HITECH",
     "HITRUST_CSF"
    ],
+   "offboarded": true,
+   "offboarded_at": "2026-09-07T00:00:00Z",
+   "offboarded_reason": "contract ended \u2014 no longer in book of business",
    "nonprod": false,
    "cells": {
     "auth": {
@@ -2922,7 +2679,236 @@
     "bypass codes"
    ],
    "change_summary": "n/a 3, proposed 17"
+  }
+ ],
+ "actions": [
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer B: Telephony stalled",
+   "why": "Telephony stopped arriving while auth is still flowing, so the container is alive but this stream is dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
+   "tenants": [
+    "tenant-b"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-b-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-b-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-b && python pull.py --logs-only   # streams: telephony",
+     "note": "backfill while DLS catches up"
+    }
+   ],
+   "n": 1
   },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer C: Admin stalled",
+   "why": "Admin stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "tenant-c"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-c-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-c-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-c",
+     "note": null
+    }
+   ],
+   "n": 2
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant B (Advantage): Auth, Telephony, Admin not flowing",
+   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.",
+   "tenants": [
+    "lab-b"
+   ],
+   "commands": [
+    {
+     "cmd": "python schema_drift.py --tenant lab-b --apply",
+     "note": "first: unblock the merge"
+    },
+    {
+     "cmd": "docker restart lab-b-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-b-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-b && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant lab-b",
+     "note": null
+    }
+   ],
+   "n": 3
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant C (Essentials): Auth, Telephony, Admin not flowing",
+   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.",
+   "tenants": [
+    "lab-c"
+   ],
+   "commands": [
+    {
+     "cmd": "python schema_drift.py --tenant lab-c --apply",
+     "note": "first: unblock the merge"
+    },
+    {
+     "cmd": "docker restart lab-c-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-c-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-c && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant lab-c",
+     "note": null
+    }
+   ],
+   "n": 4
+  },
+  {
+   "severity": "AMBER",
+   "group": "pull",
+   "title": "API pull has not completed in over 24h for 3 tenants",
+   "why": "The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report's scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.",
+   "tenants": [
+    "tenant-c",
+    "lab-a",
+    "lab-b"
+   ],
+   "nonprod": false,
+   "commands": [
+    {
+     "cmd": "schtasks /Query /FO LIST /V | findstr /I \"Duo-Analytics\"",
+     "note": "on the report host"
+    },
+    {
+     "cmd": "nssm status Duo-Analytics",
+     "note": null
+    }
+   ],
+   "n": 5
+  },
+  {
+   "severity": "AMBER",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant A (Premier): Auth, Telephony stalled",
+   "why": "Auth, Telephony stopped arriving. DLS checkpoints are old (Telephony 51d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "lab-a"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart lab-a-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-a-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-a && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    }
+   ],
+   "n": 6
+  },
+  {
+   "severity": "AMBER",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Customer E (Non-Production): Auth, Telephony, Admin stalled",
+   "why": "Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
+   "tenants": [
+    "tenant-e"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-e-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-e && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-e",
+     "note": null
+    }
+   ],
+   "n": 7
+  },
+  {
+   "severity": "INFO",
+   "group": "infra",
+   "nonprod": false,
+   "title": "3 containers restarted just before this run",
+   "why": "tenant-a-duologsync up 52 seconds, lab-c-duologsync up about a minute, tenant-d-duologsync up about a minute. Health is still 'starting', so today's freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.",
+   "tenants": [
+    "tenant-a",
+    "lab-c",
+    "tenant-d"
+   ],
+   "commands": [],
+   "n": 8
+  },
+  {
+   "severity": "INFO",
+   "group": "report",
+   "nonprod": false,
+   "title": "SLO history exists for only 0 of 7 tenants",
+   "why": "Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.",
+   "tenants": [
+    "tenant-b",
+    "tenant-c",
+    "lab-a",
+    "lab-b",
+    "lab-c",
+    "tenant-d",
+    "tenant-e"
+   ],
+   "commands": [],
+   "n": 9
+  }
+ ],
+ "customer_tenants": [
   {
    "slug": "tenant-b",
    "name": "Customer B",
@@ -3105,6 +3091,7 @@
     "HITECH",
     "HITRUST_CSF"
    ],
+   "offboarded": false,
    "nonprod": false,
    "cells": {
     "auth": {
@@ -3348,6 +3335,7 @@
     "HITECH",
     "HITRUST_CSF"
    ],
+   "offboarded": false,
    "nonprod": false,
    "cells": {
     "auth": {
@@ -3608,6 +3596,7 @@
     "HITRUST_CSF",
     "NIST_CSF_2.0"
    ],
+   "offboarded": false,
    "nonprod": false,
    "cells": {
     "auth": {
@@ -3866,6 +3855,7 @@
     "SOC2",
     "CIS_Controls_v8"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -4149,6 +4139,7 @@
     "SOC2",
     "CIS_Controls_v8"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -4455,6 +4446,7 @@
     "SOC2",
     "CIS_Controls_v8"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -4756,6 +4748,7 @@
     "HITRUST_CSF",
     "NIST_CSF_2.0"
    ],
+   "offboarded": false,
    "nonprod": true,
    "cells": {
     "auth": {
@@ -4857,35 +4850,6 @@
    "severity": "RED",
    "group": "stream",
    "nonprod": false,
-   "title": "Customer A: Telephony, Admin stalled",
-   "why": "Telephony, Admin stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d), so DLS has not written those streams in a long time and the API pull has been the real source.",
-   "tenants": [
-    "tenant-a"
-   ],
-   "commands": [
-    {
-     "cmd": "docker restart tenant-a-duologsync",
-     "note": null
-    },
-    {
-     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-a-dls",
-     "note": "only if the restart does not clear it"
-    },
-    {
-     "cmd": "set DUO_TENANT_SLUG=tenant-a && python pull.py --logs-only   # streams: telephony",
-     "note": "backfill while DLS catches up"
-    },
-    {
-     "cmd": "python pull_activity.py --tenant tenant-a",
-     "note": null
-    }
-   ],
-   "n": 1
-  },
-  {
-   "severity": "RED",
-   "group": "stream",
-   "nonprod": false,
    "title": "Customer B: Telephony stalled",
    "why": "Telephony stopped arriving while auth is still flowing, so the container is alive but this stream is dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
    "tenants": [
@@ -4905,7 +4869,7 @@
      "note": "backfill while DLS catches up"
     }
    ],
-   "n": 2
+   "n": 1
   },
   {
    "severity": "RED",
@@ -4930,7 +4894,7 @@
      "note": null
     }
    ],
-   "n": 3
+   "n": 2
   },
   {
    "severity": "AMBER",
@@ -4953,7 +4917,7 @@
      "note": null
     }
    ],
-   "n": 6
+   "n": 5
   }
  ],
  "email_rows_nonprod": [
@@ -4988,7 +4952,7 @@
      "note": null
     }
    ],
-   "n": 4
+   "n": 3
   },
   {
    "severity": "RED",
@@ -5021,7 +4985,7 @@
      "note": null
     }
    ],
-   "n": 5
+   "n": 4
   },
   {
    "severity": "AMBER",
@@ -5046,7 +5010,7 @@
      "note": "backfill while DLS catches up"
     }
    ],
-   "n": 7
+   "n": 6
   },
   {
    "severity": "AMBER",
@@ -5075,7 +5039,7 @@
      "note": null
     }
    ],
-   "n": 8
+   "n": 7
   }
  ],
  "email_info_count": 2

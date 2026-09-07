@@ -55,6 +55,17 @@ SEVERITY_GLYPH = {"RED": "■", "AMBER": "▲", "GREEN": "●", "INFO": "○"}
 NONPROD_NAME_HINTS = ("non-production", "non prod", "nonprod")
 
 
+def is_offboarded(t: dict) -> bool:
+    """True once a tenant's contract has ended. Distinct from is_nonprod: an
+    offboarded tenant is excluded from EVERYTHING — the fleet verdict, the
+    customer tally, and the action queue — because alerting on a decommissioned
+    customer's broken pipeline is noise, not a finding. It still gets one
+    transparent line in the footer (name, when, why) so the exclusion is
+    auditable rather than a silent disappearance.
+    """
+    return bool(t.get("offboarded"))
+
+
 def is_nonprod(t: dict) -> bool:
     """True if a tenant should be excluded from the fleet/customer verdict.
 
@@ -233,6 +244,8 @@ def derive_actions(model: dict) -> list[dict]:
 
     # 1. One action per tenant with a broken stream: stalled (had data, stopped) or never bootstrapped.
     for t in tenants:
+        if t["offboarded"]:
+            continue
         stalled, never = [], []
         for key, label, _ in STREAMS:
             s = t["streams"][key]
@@ -289,7 +302,7 @@ def derive_actions(model: dict) -> list[dict]:
                         "why": " ".join(parts), "tenants": [t["slug"]], "commands": cmds})
 
     # 2. API fallback pull not running.
-    late = [t for t in tenants if t["pull"]["age_h"] is not None and t["pull"]["age_h"] > 24]
+    late = [t for t in tenants if not t["offboarded"] and t["pull"]["age_h"] is not None and t["pull"]["age_h"] > 24]
     if late:
         actions.append({"severity": "AMBER", "group": "pull",
                         "title": f"API pull has not completed in over 24h for {len(late)} tenants",
@@ -310,10 +323,11 @@ def derive_actions(model: dict) -> list[dict]:
                         "tenants": [c["tenant"] for c in fresh], "commands": []})
 
     # 4. Observability gaps in the report itself.
-    warming = [t for t in tenants if all(v.get("warming") for v in t["slo"].values())]
-    if len(warming) >= max(2, len(tenants) // 2):
+    active = [t for t in tenants if not t["offboarded"]]
+    warming = [t for t in active if all(v.get("warming") for v in t["slo"].values())]
+    if len(warming) >= max(2, len(active) // 2):
         actions.append({"severity": "INFO", "group": "report", "nonprod": False,
-                        "title": f"SLO history exists for only {len(tenants) - len(warming)} of {len(tenants)} tenants",
+                        "title": f"SLO history exists for only {len(active) - len(warming)} of {len(active)} tenants",
                         "why": "Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.",
                         "tenants": [t["slug"] for t in warming], "commands": []})
 
@@ -347,6 +361,7 @@ def enrich(model: dict) -> dict:
     tenants = model["tenants"]
     retire_deprecated(model)
     for t in tenants:
+        t["offboarded"] = is_offboarded(t)
         t["nonprod"] = is_nonprod(t)
         t["cells"] = {k: stream_cell(t["streams"][k]) for k, _, _ in STREAMS}
         t["issues"] = tenant_issues(t)
@@ -376,9 +391,11 @@ def enrich(model: dict) -> dict:
             healthy.append("no data gaps")
         t["healthy"] = healthy
         t["change_summary"] = ", ".join(f"{k} {v}" for k, v in sorted(t["changes"]["change_log"].items()))
+    model["offboarded_tenants"] = [t for t in tenants if t["offboarded"]]
+    active_tenants = [t for t in tenants if not t["offboarded"]]
     model["actions"] = derive_actions(model)
-    model["customer_tenants"] = [t for t in tenants if not t["nonprod"]]
-    model["nonprod_tenants"] = [t for t in tenants if t["nonprod"]]
+    model["customer_tenants"] = [t for t in active_tenants if not t["nonprod"]]
+    model["nonprod_tenants"] = [t for t in active_tenants if t["nonprod"]]
     customer_tenants = model["customer_tenants"]
     s = model["summary"]
     s["total"] = s["ok"] + s["warn"] + s["err"]

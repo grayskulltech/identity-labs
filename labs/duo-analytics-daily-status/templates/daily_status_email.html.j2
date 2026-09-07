@@ -101,6 +101,14 @@
     {% endif %}
   </td></tr>
 
+  {% if m.offboarded_tenants %}
+  <tr><td class="hair" style="padding:2px 28px 16px;border-top:1px solid #eeeeea;">
+    <p class="muted" style="font-size:11px;line-height:1.5;color:#9a9a94;margin:14px 0 0;">
+      Excluded (offboarded): {{ m.offboarded_tenants|map(attribute='name')|join(', ') }}.
+    </p>
+  </td></tr>
+  {% endif %}
+
   <!-- footer -->
   <tr><td class="hair" style="padding:14px 28px 20px;border-top:1px solid #e6e6e1;">
     <p class="muted" style="font-size:11px;line-height:1.5;color:#9a9a94;margin:0;">

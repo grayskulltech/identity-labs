@@ -419,6 +419,27 @@
     </div>
   </section>
 
+  {% if m.offboarded_tenants %}
+  <section id="offboarded">
+    <h2>Offboarded <small>excluded from every check above — kept here for the audit trail, not the fleet verdict</small></h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Tenant</th><th>Slug</th><th>Offboarded</th><th>Reason</th></tr></thead>
+        <tbody>
+          {% for t in m.offboarded_tenants %}
+          <tr>
+            <td>{{ t.name }}</td>
+            <td class="mono">{{ t.slug }}</td>
+            <td class="mono">{{ t.offboarded_at|ts if t.offboarded_at else '—' }}</td>
+            <td>{{ t.offboarded_reason or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
   <footer>
     <span>{{ m.report.product }} · {{ m.report.date }} {{ m.report.time_utc }}</span>
     <span class="mono">{{ m.report.run_id }}</span>

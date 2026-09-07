@@ -232,8 +232,8 @@
     <div class="strip">
       <div class="tile">
         <div class="label">Customer tenants</div>
-        <div class="value">4</div>
-        <div class="sub">4 err · 0 warn · 0 ok</div>
+        <div class="value">3</div>
+        <div class="sub">3 err · 0 warn · 0 ok</div>
 <div class="sub">+ 4 lab/non-prod (4 err · 0 warn), excluded from fleet status</div>      </div>
       <div class="tile">
         <div class="label">Checks</div>
@@ -245,7 +245,7 @@
       </div>
       <div class="tile">
         <div class="label">Actions today</div>
-        <div class="value">8</div>
+        <div class="value">7</div>
         <div class="sub">2 more to note, no action</div>
       </div>
       <div class="tile">
@@ -262,20 +262,6 @@
       <article class="act RED">
         <div class="n">01</div>
         <div class="body">
-          <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer A: Telephony, Admin stalled</h3></div>
-          <p class="why">Telephony, Admin stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
-          <div class="tags"><span class="tag">tenant-a</span></div>
-          <pre class="cmd">docker restart tenant-a-duologsync
-<span class="c"># only if the restart does not clear it</span>
-docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-a-dls
-<span class="c"># backfill while DLS catches up</span>
-set DUO_TENANT_SLUG=tenant-a &amp;&amp; python pull.py --logs-only   # streams: telephony
-python pull_activity.py --tenant tenant-a</pre>
-        </div>
-      </article>
-      <article class="act RED">
-        <div class="n">02</div>
-        <div class="body">
           <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer B: Telephony stalled</h3></div>
           <p class="why">Telephony stopped arriving while auth is still flowing, so the container is alive but this stream is dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
           <div class="tags"><span class="tag">tenant-b</span></div>
@@ -287,7 +273,7 @@ set DUO_TENANT_SLUG=tenant-b &amp;&amp; python pull.py --logs-only   # streams: 
         </div>
       </article>
       <article class="act RED">
-        <div class="n">03</div>
+        <div class="n">02</div>
         <div class="body">
           <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Customer C: Admin stalled</h3></div>
           <p class="why">Admin stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
@@ -299,7 +285,7 @@ python pull_activity.py --tenant tenant-c</pre>
         </div>
       </article>
       <article class="act RED">
-        <div class="n">04</div>
+        <div class="n">03</div>
         <div class="body">
           <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant B (Advantage): Auth, Telephony, Admin not flowing</h3></div>
           <p class="why">Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.</p>
@@ -315,7 +301,7 @@ python pull_activity.py --tenant lab-b</pre>
         </div>
       </article>
       <article class="act RED">
-        <div class="n">05</div>
+        <div class="n">04</div>
         <div class="body">
           <div class="head"><span class="chip RED"><span class="g" aria-hidden="true">■</span>ERR</span><h3>Lab Tenant C (Essentials): Auth, Telephony, Admin not flowing</h3></div>
           <p class="why">Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.</p>
@@ -331,7 +317,7 @@ python pull_activity.py --tenant lab-c</pre>
         </div>
       </article>
       <article class="act AMBER">
-        <div class="n">06</div>
+        <div class="n">05</div>
         <div class="body">
           <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>API pull has not completed in over 24h for 3 tenants</h3></div>
           <p class="why">The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report&#39;s scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.</p>
@@ -342,7 +328,7 @@ nssm status Duo-Analytics</pre>
         </div>
       </article>
       <article class="act AMBER">
-        <div class="n">07</div>
+        <div class="n">06</div>
         <div class="body">
           <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Lab Tenant A (Premier): Auth, Telephony stalled</h3></div>
           <p class="why">Auth, Telephony stopped arriving. DLS checkpoints are old (Telephony 51d), so DLS has not written those streams in a long time and the API pull has been the real source.</p>
@@ -355,7 +341,7 @@ set DUO_TENANT_SLUG=lab-a &amp;&amp; python pull.py --logs-only   # streams: aut
         </div>
       </article>
       <article class="act AMBER">
-        <div class="n">08</div>
+        <div class="n">07</div>
         <div class="body">
           <div class="head"><span class="chip AMBER"><span class="g" aria-hidden="true">▲</span>WARN</span><h3>Customer E (Non-Production): Auth, Telephony, Admin stalled</h3></div>
           <p class="why">Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.</p>
@@ -369,7 +355,7 @@ python pull_activity.py --tenant tenant-e</pre>
         </div>
       </article>
       <article class="act INFO">
-        <div class="n">09</div>
+        <div class="n">08</div>
         <div class="body">
           <div class="head"><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span><h3>3 containers restarted just before this run</h3></div>
           <p class="why">tenant-a-duologsync up 52 seconds, lab-c-duologsync up about a minute, tenant-d-duologsync up about a minute. Health is still &#39;starting&#39;, so today&#39;s freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.</p>
@@ -377,9 +363,9 @@ python pull_activity.py --tenant tenant-e</pre>
         </div>
       </article>
       <article class="act INFO">
-        <div class="n">10</div>
+        <div class="n">09</div>
         <div class="body">
-          <div class="head"><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span><h3>SLO history exists for only 1 of 8 tenants</h3></div>
+          <div class="head"><span class="chip INFO"><span class="g" aria-hidden="true">○</span>INFO</span><h3>SLO history exists for only 0 of 7 tenants</h3></div>
           <p class="why">Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.</p>
           <div class="tags"><span class="tag">tenant-b</span><span class="tag">tenant-c</span><span class="tag">lab-a</span><span class="tag">lab-b</span><span class="tag">lab-c</span><span class="tag">tenant-d</span><span class="tag">tenant-e</span></div>
         </div>
@@ -400,21 +386,6 @@ python pull_activity.py --tenant tenant-e</pre>
         </thead>
         <tbody>
           <tr class="group"><td colspan="6">Customer tenants</td></tr>
-          <tr>
-            <td class="tenant"><div class="name">Customer A</div><div class="slug">tenant-a · Duo Advantage</div></td>
-<td class="cell">
-  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>12m<span class="sr" hidden>OK</span></div>
-<div class="s">11.9K rows/24h</div></td><td class="cell">
-  <div class="v RED"><span class="g" aria-hidden="true">■</span>24.8h<span class="sr" hidden>ERR</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 4h</div><div class="cp">checkpoint 142d old</div></td><td class="cell">
-  <div class="v RED"><span class="g" aria-hidden="true">■</span>35.1h<span class="sr" hidden>ERR</span></div>
-<div class="s">0 rows/24h</div><div class="s">limit 24h</div><div class="cp">checkpoint 109d old</div></td>            <td class="cell">
-  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>54m<span class="sr" hidden>OK</span></div>
-<div class="s">+0 auth / +0 tel</div></td>
-            <td class="cell">
-  <div class="v GREEN"><span class="g" aria-hidden="true">●</span>parity<span class="sr" hidden>OK</span></div>
-</td>
-          </tr>
           <tr>
             <td class="tenant"><div class="name">Customer B</div><div class="slug">tenant-b · Duo Advantage</div></td>
 <td class="cell">
@@ -951,6 +922,23 @@ python pull_activity.py --tenant tenant-e</pre>
           <span class="k">Fix drift</span><code>python schema_drift.py --tenant &lt;slug&gt; --apply</code>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section id="offboarded">
+    <h2>Offboarded <small>excluded from every check above — kept here for the audit trail, not the fleet verdict</small></h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Tenant</th><th>Slug</th><th>Offboarded</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Customer A</td>
+            <td class="mono">tenant-a</td>
+            <td class="mono">2026-09-07 00:00</td>
+            <td>contract ended — no longer in book of business</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 

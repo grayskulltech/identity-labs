@@ -107,6 +107,20 @@ none is. The fleet strip shows the excluded count and its err/warn split
 alongside the customer tally, so nothing is hidden, only kept out of the
 verdict.
 
+## Offboarding a tenant
+
+Set `offboarded: true` (and optionally `offboarded_at`, an ISO timestamp, and
+`offboarded_reason`) on a tenant once its contract has ended. `is_offboarded()`
+in `render.py` then excludes it from *everything*: the fleet-wide verdict, the
+customer tally, the stream matrix, and the action queue — no more nightly
+alerts about a decommissioned customer's broken pipeline. This is stricter
+than `nonprod`, whose problems still generate actions because they still need
+fixing; an offboarded tenant's don't, because nothing is going to fix them.
+
+The exclusion is never silent: both templates list offboarded tenants in a
+small audit section (full report) or a one-line footnote (email) — name, when,
+and why — so the drop from the report reads as a decision, not a data loss.
+
 ## Deprecated streams
 
 `DEPRECATED_STREAMS` in `render.py` lists streams the collector may still
