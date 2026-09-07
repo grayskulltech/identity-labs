@@ -1,18 +1,30 @@
 # Duo Analytics Daily Status: report renderer
 
-A replacement layout for the Duo Analytics daily status email. It takes the
-collector's fleet-status model as JSON and renders one HTML page that answers,
-in order, the three questions the reader actually has at 07:00:
+A replacement for the Duo Analytics daily status email. It takes the
+collector's fleet-status model as JSON and renders two things from the same
+model:
 
-1. **What do I do today?** An action queue grouped by root cause, ordered by
-   impact, with each recovery command printed exactly once.
-2. **Which streams are broken, where?** One matrix: tenants down, streams
-   across, the age of the newest row in every cell.
-3. **What is the evidence?** Per-tenant detail that lists exceptions only.
-   Healthy checks are counted, not itemised.
+- **`--style email` (default)** — what actually gets mailed. Plain, table-based,
+  inline-styled, one page, no scrolling on a normal inbox width: a status line,
+  a one-sentence count, and one row per open customer action with its title
+  and lead sentence. Matches the shape of a Duo admin alert email, not a
+  dashboard — no chrome, no matrix, no cards, no dark mode. Lab/non-production
+  items and informational notes are folded into a single footnote line, and
+  a footer link points at the full report for anyone who needs the actual
+  recovery commands.
+- **`--style full`** — the dashboard: an action queue with every recovery
+  command, a tenant-by-stream freshness matrix, and exception-only tenant
+  detail. Meant to be linked from the email's "View full report" line, not
+  mailed itself.
 
-Fleet-level facts (Duo service status, releases, containers, disk, scheduler)
-appear once, at the bottom, instead of once per tenant.
+```bash
+python render.py fleet-status.json -o daily-status.html            # email (default)
+python render.py fleet-status.json --style full -o report.html     # full dashboard
+```
+
+Set `report.full_report_url` in the model (optional) to point the email's
+link at wherever the full report is hosted; without it the email just names
+the command to generate one.
 
 ## Why the old format failed
 
@@ -34,13 +46,12 @@ appear once, at the bottom, instead of once per tenant.
 
 ```bash
 pip install jinja2
-python render.py fleet-status.json -o daily-status.html
-python render.py fleet-status.json --anonymize -o sample.html   # neutral tenant labels, for sharing
+python render.py fleet-status.json -o daily-status.html --anonymize   # neutral tenant labels, for sharing
 ```
 
 `samples/fleet-status.sample.json` is a real run shape with tenant identity
-replaced by neutral labels; `samples/fleet-status.sample.html` is its rendered
-output.
+replaced by neutral labels; `samples/fleet-status.sample.email.html` and
+`samples/fleet-status.sample.full.html` are its two rendered forms.
 
 ## Model schema
 

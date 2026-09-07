@@ -8,13 +8,25 @@
   "confidential": true,
   "collect_seconds": 553.6,
   "collector_errors": 0,
-  "run_id": "20260906T110000Z-sample"
+  "run_id": "20260906T110000Z-sample",
+  "date_long": "Sunday 6 September 2026",
+  "date_short": "Sep 06, 2026",
+  "time_utc": "11:00 UTC",
+  "subject": "Duo Analytics [ERR] 4 customer tenants need action \u2014 Sep 06, 2026"
  },
  "summary": {
   "tenants": 8,
-  "ok": 110,
-  "warn": 61,
-  "err": 24
+  "ok": 101,
+  "warn": 41,
+  "err": 21,
+  "retired": 32,
+  "total": 163,
+  "tenants_red": 4,
+  "tenants_amber": 0,
+  "tenants_green": 0,
+  "nonprod_tenants": 4,
+  "nonprod_red": 4,
+  "nonprod_amber": 0
  },
  "fleet": {
   "duo_status": {
@@ -294,7 +306,122 @@
     "HIPAA",
     "HITECH",
     "HITRUST_CSF"
-   ]
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "12m",
+     "secondary": "11.9K rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "RED",
+     "primary": "24.8h",
+     "secondary": "0 rows/24h",
+     "limit": "limit 4h",
+     "checkpoint_note": "checkpoint 142d old",
+     "checkpoint_status": "RED"
+    },
+    "admin": {
+     "status": "RED",
+     "primary": "35.1h",
+     "secondary": "0 rows/24h",
+     "limit": "limit 24h",
+     "checkpoint_note": "checkpoint 109d old",
+     "checkpoint_status": "RED"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Telephony freshness",
+     "text": "last row 2026-09-05 10:15 UTC (24.8h ago, limit 4h)"
+    },
+    {
+     "status": "RED",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (8.1M lifetime)"
+    },
+    {
+     "status": "RED",
+     "check": "Telephony checkpoint",
+     "text": "DLS checkpoint 2026-04-17 12:53 UTC (142d old)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin freshness",
+     "text": "last row 2026-09-04 23:54 UTC (35.1h ago, limit 24h)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (944.9K lifetime)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-05-19 23:29 UTC (109d old)"
+    },
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "12 days with no data. Includes 2026-08-15, 2026-08-16, 2026-08-17, 2026-08-18, 2026-08-19"
+    },
+    {
+     "status": "RED",
+     "check": "SLO auth freshness",
+     "text": "63.6% over 33 daily samples"
+    },
+    {
+     "status": "RED",
+     "check": "SLO telephony freshness",
+     "text": "54.5% over 33 daily samples (2026-08-07 to 2026-09-05)"
+    },
+    {
+     "status": "RED",
+     "check": "SLO ingest volume",
+     "text": "63.6% over 33 daily samples (2026-08-07 to 2026-09-05)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony volume",
+     "text": "yesterday 505 vs same-weekday median 1,542"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 972"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "5 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 10,
+   "warn": 3,
+   "headline": "Telephony freshness last row 2026-09-05 10:15 UTC (24.8h ago, limit 4h); Telephony ingest 0 rows in 24h (8.1M lifetime)",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "54m",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "staging parity",
+    "API pull",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "n/a 3, proposed 17"
   },
   {
    "slug": "tenant-b",
@@ -477,7 +604,65 @@
     "HIPAA",
     "HITECH",
     "HITRUST_CSF"
-   ]
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "1.4h",
+     "secondary": "99 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "RED",
+     "primary": "13.8h",
+     "secondary": "26 rows/24h",
+     "limit": "limit 4h",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "admin": {
+     "status": "GREEN",
+     "primary": "10.4h",
+     "secondary": "7 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Telephony freshness",
+     "text": "last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h)"
+    }
+   ],
+   "err": 1,
+   "warn": 0,
+   "headline": "Telephony freshness last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h)",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "4h",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "admin stream",
+    "staging parity",
+    "API pull",
+    "container log",
+    "telephony spend",
+    "bypass codes",
+    "no data gaps"
+   ],
+   "change_summary": "proposed 15"
   },
   {
    "slug": "tenant-c",
@@ -662,7 +847,84 @@
     "HIPAA",
     "HITECH",
     "HITRUST_CSF"
-   ]
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "6m",
+     "secondary": "1.2K rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "GREEN",
+     "primary": "3.6h",
+     "secondary": "30 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "admin": {
+     "status": "RED",
+     "primary": "2d",
+     "secondary": "0 rows/24h",
+     "limit": "limit 24h",
+     "checkpoint_note": "checkpoint 116d old",
+     "checkpoint_status": "RED"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Admin freshness",
+     "text": "last row 2026-09-04 07:43 UTC (2d ago, limit 24h)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (5.9M lifetime)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-05-13 16:08 UTC (116d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 631"
+    },
+    {
+     "status": "AMBER",
+     "check": "API pull",
+     "text": "last completed 2026-09-05 08:07 UTC (26.9h ago)"
+    }
+   ],
+   "err": 3,
+   "warn": 2,
+   "headline": "Admin freshness last row 2026-09-04 07:43 UTC (2d ago, limit 24h); Admin ingest 0 rows in 24h (5.9M lifetime)",
+   "pull_cell": {
+    "status": "AMBER",
+    "primary": "26.9h",
+    "secondary": "+1 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "telephony stream",
+    "staging parity",
+    "container log",
+    "telephony spend",
+    "bypass codes",
+    "no data gaps"
+   ],
+   "change_summary": "n/a 2, proposed 16"
   },
   {
    "slug": "lab-a",
@@ -851,7 +1113,92 @@
    "frameworks": [
     "SOC2",
     "CIS_Controls_v8"
-   ]
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "35.8h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "51d",
+     "secondary": "0 rows/24h",
+     "limit": "limit 7d",
+     "checkpoint_note": "checkpoint 51d old",
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "GREEN",
+     "primary": "36m",
+     "secondary": "94 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "22 days with no data. Includes 2026-08-27, 2026-08-28, 2026-08-29, 2026-08-30, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (1.3K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "DLS checkpoint 2026-09-04 23:11 UTC (35.8h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony freshness",
+     "text": "last row 2026-07-17 01:26 UTC (51d ago, limit 7d)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (14 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "DLS checkpoint 2026-07-17 01:26 UTC (51d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "API pull",
+     "text": "last completed 2026-09-05 07:30 UTC (27.5h ago)"
+    }
+   ],
+   "err": 1,
+   "warn": 6,
+   "headline": "Gaps (30d) 22 days with no data. Includes 2026-08-27, 2026-08-28, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (1.3K lifetime)",
+   "pull_cell": {
+    "status": "AMBER",
+    "primary": "27.5h",
+    "secondary": "+1 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "admin stream",
+    "staging parity",
+    "container log",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "n/a 5, proposed 12"
   },
   {
    "slug": "lab-b",
@@ -1049,7 +1396,114 @@
    "frameworks": [
     "SOC2",
     "CIS_Controls_v8"
-   ]
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "AMBER",
+     "primary": "44h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Schema drift",
+     "text": "5 tables missing merge columns, 1,726 rows stuck in staging"
+    },
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (1.1K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-09-04 15:02 UTC (44h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "API pull",
+     "text": "last completed 2026-09-05 08:00 UTC (27h ago)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "1 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 2,
+   "warn": 10,
+   "headline": "Schema drift 5 tables missing merge columns, 1,726 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05",
+   "pull_cell": {
+    "status": "AMBER",
+    "primary": "27h",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "RED",
+    "primary": "1.7K stuck",
+    "secondary": "5 tables"
+   },
+   "healthy": [
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "proposed 3"
   },
   {
    "slug": "lab-c",
@@ -1248,7 +1702,115 @@
    "frameworks": [
     "SOC2",
     "CIS_Controls_v8"
-   ]
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "AMBER",
+     "primary": "2d",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": "checkpoint 27d old",
+     "checkpoint_status": "AMBER"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Schema drift",
+     "text": "5 tables missing merge columns, 16 rows stuck in staging"
+    },
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (41.4K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 631"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-08-10 14:14 UTC (27d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "5 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 2,
+   "warn": 10,
+   "headline": "Schema drift 5 tables missing merge columns, 16 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "1.9h",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "RED",
+    "primary": "16 stuck",
+    "secondary": "5 tables"
+   },
+   "healthy": [
+    "API pull",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "proposed 3"
   },
   {
    "slug": "tenant-d",
@@ -1431,7 +1993,74 @@
     "HIPAA",
     "HITRUST_CSF",
     "NIST_CSF_2.0"
-   ]
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "1.1h",
+     "secondary": "27.5K rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "GREEN",
+     "primary": "1.1h",
+     "secondary": "221 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "admin": {
+     "status": "GREEN",
+     "primary": "1.1h",
+     "secondary": "262 rows/24h",
+     "limit": "",
+     "checkpoint_note": "checkpoint 138d old",
+     "checkpoint_status": "RED"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-04-21 22:39 UTC (138d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "5 ERROR lines in the last 200 log lines"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony credits",
+     "text": "278 credits across 221 transactions in 24h"
+    }
+   ],
+   "err": 1,
+   "warn": 2,
+   "headline": "Admin checkpoint DLS checkpoint 2026-04-21 22:39 UTC (138d old); Container log 5 ERROR lines in the last 200 log lines",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "1h",
+    "secondary": "+9.5K auth / +110 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "telephony stream",
+    "admin stream",
+    "staging parity",
+    "API pull",
+    "bypass codes",
+    "no data gaps"
+   ],
+   "change_summary": "proposed 17"
   },
   {
    "slug": "tenant-e",
@@ -1624,7 +2253,2830 @@
     "HIPAA",
     "HITRUST_CSF",
     "NIST_CSF_2.0"
-   ]
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "38.8h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "2d",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "AMBER",
+     "primary": "44.2h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "9 days with no data. Includes 2026-08-22, 2026-08-23, 2026-08-29, 2026-08-30, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (2.5K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "DLS checkpoint 2026-09-04 20:12 UTC (38.8h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (99 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "DLS checkpoint 2026-09-04 10:04 UTC (2d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (147.9K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 632"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-09-04 14:50 UTC (44.2h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "1 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 1,
+   "warn": 8,
+   "headline": "Gaps (30d) 9 days with no data. Includes 2026-08-22, 2026-08-23, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (2.5K lifetime)",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "1.4h",
+    "secondary": "+1 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "staging parity",
+    "API pull",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "n/a 1, proposed 18"
   }
- ]
+ ],
+ "actions": [
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer A: Telephony, Admin stalled",
+   "why": "Telephony, Admin stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "tenant-a"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-a-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-a-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-a && python pull.py --logs-only   # streams: telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-a",
+     "note": null
+    }
+   ],
+   "n": 1
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer B: Telephony stalled",
+   "why": "Telephony stopped arriving while auth is still flowing, so the container is alive but this stream is dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
+   "tenants": [
+    "tenant-b"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-b-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-b-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-b && python pull.py --logs-only   # streams: telephony",
+     "note": "backfill while DLS catches up"
+    }
+   ],
+   "n": 2
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer C: Admin stalled",
+   "why": "Admin stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "tenant-c"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-c-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-c-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-c",
+     "note": null
+    }
+   ],
+   "n": 3
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant B (Advantage): Auth, Telephony, Admin not flowing",
+   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.",
+   "tenants": [
+    "lab-b"
+   ],
+   "commands": [
+    {
+     "cmd": "python schema_drift.py --tenant lab-b --apply",
+     "note": "first: unblock the merge"
+    },
+    {
+     "cmd": "docker restart lab-b-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-b-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-b && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant lab-b",
+     "note": null
+    }
+   ],
+   "n": 4
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant C (Essentials): Auth, Telephony, Admin not flowing",
+   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.",
+   "tenants": [
+    "lab-c"
+   ],
+   "commands": [
+    {
+     "cmd": "python schema_drift.py --tenant lab-c --apply",
+     "note": "first: unblock the merge"
+    },
+    {
+     "cmd": "docker restart lab-c-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-c-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-c && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant lab-c",
+     "note": null
+    }
+   ],
+   "n": 5
+  },
+  {
+   "severity": "AMBER",
+   "group": "pull",
+   "title": "API pull has not completed in over 24h for 3 tenants",
+   "why": "The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report's scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.",
+   "tenants": [
+    "tenant-c",
+    "lab-a",
+    "lab-b"
+   ],
+   "nonprod": false,
+   "commands": [
+    {
+     "cmd": "schtasks /Query /FO LIST /V | findstr /I \"Duo-Analytics\"",
+     "note": "on the report host"
+    },
+    {
+     "cmd": "nssm status Duo-Analytics",
+     "note": null
+    }
+   ],
+   "n": 6
+  },
+  {
+   "severity": "AMBER",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant A (Premier): Auth, Telephony stalled",
+   "why": "Auth, Telephony stopped arriving. DLS checkpoints are old (Telephony 51d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "lab-a"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart lab-a-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-a-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-a && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    }
+   ],
+   "n": 7
+  },
+  {
+   "severity": "AMBER",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Customer E (Non-Production): Auth, Telephony, Admin stalled",
+   "why": "Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
+   "tenants": [
+    "tenant-e"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-e-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-e && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-e",
+     "note": null
+    }
+   ],
+   "n": 8
+  },
+  {
+   "severity": "INFO",
+   "group": "infra",
+   "nonprod": false,
+   "title": "3 containers restarted just before this run",
+   "why": "tenant-a-duologsync up 52 seconds, lab-c-duologsync up about a minute, tenant-d-duologsync up about a minute. Health is still 'starting', so today's freshness numbers for these tenants predate the restart. Re-check after the next run before acting on them again.",
+   "tenants": [
+    "tenant-a",
+    "lab-c",
+    "tenant-d"
+   ],
+   "commands": [],
+   "n": 9
+  },
+  {
+   "severity": "INFO",
+   "group": "report",
+   "nonprod": false,
+   "title": "SLO history exists for only 1 of 8 tenants",
+   "why": "Every other tenant reports 0 samples. The sampler is either not scheduled per tenant or not persisting, so SLO percentages cannot be trusted fleet-wide yet.",
+   "tenants": [
+    "tenant-b",
+    "tenant-c",
+    "lab-a",
+    "lab-b",
+    "lab-c",
+    "tenant-d",
+    "tenant-e"
+   ],
+   "commands": [],
+   "n": 10
+  }
+ ],
+ "customer_tenants": [
+  {
+   "slug": "tenant-a",
+   "name": "Customer A",
+   "account": "ACCT01",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T10:50:00Z",
+      "age_h": 0.2,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 11904,
+      "lifetime": 27149044
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 14826,
+      "median": 2933
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T10:56:00Z",
+      "age_h": 0.1
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-05T10:15:00Z",
+      "age_h": 24.8,
+      "threshold_h": 4.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 8149596
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 505,
+      "median": 1542,
+      "samples_raw": "1,648,1,933,1,437,1,255"
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-04-17T12:53:00Z",
+      "age_h": 3406.1
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-04T23:54:00Z",
+      "age_h": 35.1,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 944860
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 972,
+      "samples_raw": "689,919,1,026,1,459"
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-05-19T23:29:00Z",
+      "age_h": 2627.5
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-09-04T17:25:00Z",
+      "age_h": 41.6,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 3829
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 2
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2025-12-31T03:21:00Z",
+      "age_h": 5983.6
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T10:04:44Z",
+    "age_h": 0.9,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 183705.6,
+    "wal_mb": 131.7,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 12,
+    "gap_dates_shown": [
+     "2026-08-15",
+     "2026-08-16",
+     "2026-08-17",
+     "2026-08-18",
+     "2026-08-19"
+    ],
+    "shapes_24h": 284
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "RED",
+     "warming": false,
+     "pct": 63.64,
+     "samples": 33,
+     "window": null
+    },
+    "telephony_freshness": {
+     "status": "RED",
+     "warming": false,
+     "pct": 54.55,
+     "samples": 33,
+     "window": [
+      "2026-08-07",
+      "2026-09-05"
+     ]
+    },
+    "ingest_volume": {
+     "status": "RED",
+     "warming": false,
+     "pct": 63.64,
+     "samples": 33,
+     "window": [
+      "2026-08-07",
+      "2026-09-05"
+     ]
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 5,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 3,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-04T10:32:57Z",
+    "users": 83500,
+    "admins": 518,
+    "telephony_credits": 8995282,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 77900
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "17",
+     "n/a": "3"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITECH",
+    "HITRUST_CSF"
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "12m",
+     "secondary": "11.9K rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "RED",
+     "primary": "24.8h",
+     "secondary": "0 rows/24h",
+     "limit": "limit 4h",
+     "checkpoint_note": "checkpoint 142d old",
+     "checkpoint_status": "RED"
+    },
+    "admin": {
+     "status": "RED",
+     "primary": "35.1h",
+     "secondary": "0 rows/24h",
+     "limit": "limit 24h",
+     "checkpoint_note": "checkpoint 109d old",
+     "checkpoint_status": "RED"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Telephony freshness",
+     "text": "last row 2026-09-05 10:15 UTC (24.8h ago, limit 4h)"
+    },
+    {
+     "status": "RED",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (8.1M lifetime)"
+    },
+    {
+     "status": "RED",
+     "check": "Telephony checkpoint",
+     "text": "DLS checkpoint 2026-04-17 12:53 UTC (142d old)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin freshness",
+     "text": "last row 2026-09-04 23:54 UTC (35.1h ago, limit 24h)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (944.9K lifetime)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-05-19 23:29 UTC (109d old)"
+    },
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "12 days with no data. Includes 2026-08-15, 2026-08-16, 2026-08-17, 2026-08-18, 2026-08-19"
+    },
+    {
+     "status": "RED",
+     "check": "SLO auth freshness",
+     "text": "63.6% over 33 daily samples"
+    },
+    {
+     "status": "RED",
+     "check": "SLO telephony freshness",
+     "text": "54.5% over 33 daily samples (2026-08-07 to 2026-09-05)"
+    },
+    {
+     "status": "RED",
+     "check": "SLO ingest volume",
+     "text": "63.6% over 33 daily samples (2026-08-07 to 2026-09-05)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony volume",
+     "text": "yesterday 505 vs same-weekday median 1,542"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 972"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "5 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 10,
+   "warn": 3,
+   "headline": "Telephony freshness last row 2026-09-05 10:15 UTC (24.8h ago, limit 4h); Telephony ingest 0 rows in 24h (8.1M lifetime)",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "54m",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "staging parity",
+    "API pull",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "n/a 3, proposed 17"
+  },
+  {
+   "slug": "tenant-b",
+   "name": "Customer B",
+   "account": "ACCT02",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:36:00Z",
+      "age_h": 1.4,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 99,
+      "lifetime": 37095
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 119,
+      "median": 66
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T09:36:00Z",
+      "age_h": 1.4
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-05T21:09:00Z",
+      "age_h": 13.8,
+      "threshold_h": 4.0
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 26,
+      "lifetime": 12950
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 26,
+      "median": 18
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-05T21:09:00Z",
+      "age_h": 13.8
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T00:33:00Z",
+      "age_h": 10.4,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 7,
+      "lifetime": 5677
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 5,
+      "median": 4
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T00:33:00Z",
+      "age_h": 10.4
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-09-03T16:04:00Z",
+      "age_h": 66.9,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 63
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-03T16:04:00Z",
+      "age_h": 66.9
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T07:00:40Z",
+    "age_h": 4.0,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 827.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "GREEN",
+    "gap_days_30d": 0,
+    "gap_dates_shown": [],
+    "shapes_24h": 796
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "GREEN",
+    "lines": 0,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T07:00:28Z",
+    "users": 600,
+    "admins": 23,
+    "telephony_credits": 1432418,
+    "admin_actions_24h": 7
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 48,
+    "telephony_txns_24h": 26,
+    "active_users": 600
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "15"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITECH",
+    "HITRUST_CSF"
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "1.4h",
+     "secondary": "99 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "RED",
+     "primary": "13.8h",
+     "secondary": "26 rows/24h",
+     "limit": "limit 4h",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "admin": {
+     "status": "GREEN",
+     "primary": "10.4h",
+     "secondary": "7 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Telephony freshness",
+     "text": "last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h)"
+    }
+   ],
+   "err": 1,
+   "warn": 0,
+   "headline": "Telephony freshness last row 2026-09-05 21:09 UTC (13.8h ago, limit 4h)",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "4h",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "admin stream",
+    "staging parity",
+    "API pull",
+    "container log",
+    "telephony spend",
+    "bypass codes",
+    "no data gaps"
+   ],
+   "change_summary": "proposed 15"
+  },
+  {
+   "slug": "tenant-c",
+   "name": "Customer C",
+   "account": "ACCT03",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T10:53:00Z",
+      "age_h": 0.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 1183,
+      "lifetime": 1935396
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 1277,
+      "median": 1301
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T11:05:00Z",
+      "age_h": -0.1
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T07:22:00Z",
+      "age_h": 3.6,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 30,
+      "lifetime": 46761
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 44,
+      "median": 41
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T07:22:00Z",
+      "age_h": 3.6
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-04T07:43:00Z",
+      "age_h": 51.3,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 5935267
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 631,
+      "samples_raw": "567,853,696,468"
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-05-13T16:08:00Z",
+      "age_h": 2778.9
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T17:45:00Z",
+      "age_h": 41.2,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 458
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T17:45:00Z",
+      "age_h": 41.2
+     }
+    }
+   },
+   "pull": {
+    "status": "AMBER",
+    "completed_at": "2026-09-05T08:07:33Z",
+    "age_h": 26.9,
+    "auth_rows": 1,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 39424.0,
+    "wal_mb": 1.4,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "GREEN",
+    "gap_days_30d": 0,
+    "gap_dates_shown": [],
+    "shapes_24h": 0
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "GREEN",
+    "lines": 0,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T08:08:24Z",
+    "users": 2200,
+    "admins": 26,
+    "telephony_credits": 183936,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 60,
+    "telephony_txns_24h": 30,
+    "active_users": 2300
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "16",
+     "n/a": "2"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITECH",
+    "HITRUST_CSF"
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "6m",
+     "secondary": "1.2K rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "GREEN",
+     "primary": "3.6h",
+     "secondary": "30 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "admin": {
+     "status": "RED",
+     "primary": "2d",
+     "secondary": "0 rows/24h",
+     "limit": "limit 24h",
+     "checkpoint_note": "checkpoint 116d old",
+     "checkpoint_status": "RED"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Admin freshness",
+     "text": "last row 2026-09-04 07:43 UTC (2d ago, limit 24h)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (5.9M lifetime)"
+    },
+    {
+     "status": "RED",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-05-13 16:08 UTC (116d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 631"
+    },
+    {
+     "status": "AMBER",
+     "check": "API pull",
+     "text": "last completed 2026-09-05 08:07 UTC (26.9h ago)"
+    }
+   ],
+   "err": 3,
+   "warn": 2,
+   "headline": "Admin freshness last row 2026-09-04 07:43 UTC (2d ago, limit 24h); Admin ingest 0 rows in 24h (5.9M lifetime)",
+   "pull_cell": {
+    "status": "AMBER",
+    "primary": "26.9h",
+    "secondary": "+1 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "telephony stream",
+    "staging parity",
+    "container log",
+    "telephony spend",
+    "bypass codes",
+    "no data gaps"
+   ],
+   "change_summary": "n/a 2, proposed 16"
+  },
+  {
+   "slug": "tenant-d",
+   "name": "Customer D",
+   "account": "ACCT07",
+   "edition": "Duo Premier",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:51:00Z",
+      "age_h": 1.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 27548,
+      "lifetime": 15673058
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 31458,
+      "median": 31850
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-05T23:38:00Z",
+      "age_h": 11.4
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:56:00Z",
+      "age_h": 1.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 221,
+      "lifetime": 368617
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 341,
+      "median": 365
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T11:05:00Z",
+      "age_h": -0.1
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T09:56:00Z",
+      "age_h": 1.1,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 262,
+      "lifetime": 436197
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 501,
+      "median": 631
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-04-21T22:39:00Z",
+      "age_h": 3300.3
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "RED",
+      "last_seen": "2026-09-04T21:08:00Z",
+      "age_h": 37.9,
+      "threshold_h": 24.0
+     },
+     "ingest": {
+      "status": "RED",
+      "rows_24h": 0,
+      "lifetime": 1929
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 3
+     },
+     "checkpoint": {
+      "status": "RED",
+      "at": "2026-01-17T23:09:00Z",
+      "age_h": 5555.9
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T09:59:45Z",
+    "age_h": 1.0,
+    "auth_rows": 9546,
+    "tel_rows": 110
+   },
+   "db": {
+    "size_mb": 119091.2,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "GREEN",
+    "gap_days_30d": 0,
+    "gap_dates_shown": [],
+    "shapes_24h": 895
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 5,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T10:15:37Z",
+    "users": 76400,
+    "admins": 62,
+    "telephony_credits": 13353559,
+    "admin_actions_24h": 262
+   },
+   "cost": {
+    "status": "AMBER",
+    "credits_24h": 278,
+    "telephony_txns_24h": 221,
+    "active_users": 85400
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "17"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITRUST_CSF",
+    "NIST_CSF_2.0"
+   ],
+   "nonprod": false,
+   "cells": {
+    "auth": {
+     "status": "GREEN",
+     "primary": "1.1h",
+     "secondary": "27.5K rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "telephony": {
+     "status": "GREEN",
+     "primary": "1.1h",
+     "secondary": "221 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    },
+    "admin": {
+     "status": "GREEN",
+     "primary": "1.1h",
+     "secondary": "262 rows/24h",
+     "limit": "",
+     "checkpoint_note": "checkpoint 138d old",
+     "checkpoint_status": "RED"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-04-21 22:39 UTC (138d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "5 ERROR lines in the last 200 log lines"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony credits",
+     "text": "278 credits across 221 transactions in 24h"
+    }
+   ],
+   "err": 1,
+   "warn": 2,
+   "headline": "Admin checkpoint DLS checkpoint 2026-04-21 22:39 UTC (138d old); Container log 5 ERROR lines in the last 200 log lines",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "1h",
+    "secondary": "+9.5K auth / +110 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "auth stream",
+    "telephony stream",
+    "admin stream",
+    "staging parity",
+    "API pull",
+    "bypass codes",
+    "no data gaps"
+   ],
+   "change_summary": "proposed 17"
+  }
+ ],
+ "nonprod_tenants": [
+  {
+   "slug": "lab-a",
+   "name": "Lab Tenant A (Premier)",
+   "account": "ACCT04",
+   "edition": "Duo Premier",
+   "status": "RED",
+   "lab": true,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T23:11:00Z",
+      "age_h": 35.8,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 1312
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T23:11:00Z",
+      "age_h": 35.8
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-07-17T01:26:00Z",
+      "age_h": 1233.6,
+      "threshold_h": 168.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 14
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-07-17T01:26:00Z",
+      "age_h": 1233.6
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-06T10:26:00Z",
+      "age_h": 0.6,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "GREEN",
+      "rows_24h": 94,
+      "lifetime": 70416
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 96,
+      "median": 95
+     },
+     "checkpoint": {
+      "status": "GREEN",
+      "at": "2026-09-06T10:57:00Z",
+      "age_h": 0.1
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": "2026-06-13T13:20:00Z",
+      "age_h": 2037.7,
+      "threshold_h": 168.0
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 1
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-06-13T13:20:00Z",
+      "age_h": 2037.7
+     }
+    }
+   },
+   "pull": {
+    "status": "AMBER",
+    "completed_at": "2026-09-05T07:30:17Z",
+    "age_h": 27.5,
+    "auth_rows": 1,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 761.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 22,
+    "gap_dates_shown": [
+     "2026-08-27",
+     "2026-08-28",
+     "2026-08-29",
+     "2026-08-30",
+     "2026-09-05"
+    ],
+    "shapes_24h": 0
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "GREEN",
+    "lines": 0,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T07:30:19Z",
+    "users": 0,
+    "admins": 0,
+    "telephony_credits": 1877,
+    "admin_actions_24h": 94
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 0
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "12",
+     "n/a": "5"
+    }
+   },
+   "frameworks": [
+    "SOC2",
+    "CIS_Controls_v8"
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "35.8h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "51d",
+     "secondary": "0 rows/24h",
+     "limit": "limit 7d",
+     "checkpoint_note": "checkpoint 51d old",
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "GREEN",
+     "primary": "36m",
+     "secondary": "94 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "GREEN"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "22 days with no data. Includes 2026-08-27, 2026-08-28, 2026-08-29, 2026-08-30, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (1.3K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "DLS checkpoint 2026-09-04 23:11 UTC (35.8h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony freshness",
+     "text": "last row 2026-07-17 01:26 UTC (51d ago, limit 7d)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (14 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "DLS checkpoint 2026-07-17 01:26 UTC (51d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "API pull",
+     "text": "last completed 2026-09-05 07:30 UTC (27.5h ago)"
+    }
+   ],
+   "err": 1,
+   "warn": 6,
+   "headline": "Gaps (30d) 22 days with no data. Includes 2026-08-27, 2026-08-28, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (1.3K lifetime)",
+   "pull_cell": {
+    "status": "AMBER",
+    "primary": "27.5h",
+    "secondary": "+1 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "admin stream",
+    "staging parity",
+    "container log",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "n/a 5, proposed 12"
+  },
+  {
+   "slug": "lab-b",
+   "name": "Lab Tenant B (Advantage)",
+   "account": "ACCT05",
+   "edition": "Duo Advantage",
+   "status": "RED",
+   "lab": true,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T15:02:00Z",
+      "age_h": 44.0,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 1138
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T15:02:00Z",
+      "age_h": 44.0
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    }
+   },
+   "pull": {
+    "status": "AMBER",
+    "completed_at": "2026-09-05T08:00:15Z",
+    "age_h": 27.0,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 11.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "RED",
+     "ok": false,
+     "tables": 5,
+     "rows_stuck": 1726,
+     "fix": "python schema_drift.py --tenant lab-b --apply",
+     "detail": "auth_logs(_merged,_staged_at), telephony_logs(_merged,_staged_at), admin_logs(_merged,_staged_at), trust_monitor_events(_merged,_staged_at), offline_enrollment_logs(_merged,_staged_at)."
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 30,
+    "gap_dates_shown": [
+     "2026-09-01",
+     "2026-09-02",
+     "2026-09-03",
+     "2026-09-04",
+     "2026-09-05"
+    ],
+    "shapes_24h": 0
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 1,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-05T08:00:16Z",
+    "users": 0,
+    "admins": 1,
+    "telephony_credits": 457,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 0
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "3"
+    }
+   },
+   "frameworks": [
+    "SOC2",
+    "CIS_Controls_v8"
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "AMBER",
+     "primary": "44h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Schema drift",
+     "text": "5 tables missing merge columns, 1,726 rows stuck in staging"
+    },
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (1.1K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-09-04 15:02 UTC (44h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "API pull",
+     "text": "last completed 2026-09-05 08:00 UTC (27h ago)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "1 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 2,
+   "warn": 10,
+   "headline": "Schema drift 5 tables missing merge columns, 1,726 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05",
+   "pull_cell": {
+    "status": "AMBER",
+    "primary": "27h",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "RED",
+    "primary": "1.7K stuck",
+    "secondary": "5 tables"
+   },
+   "healthy": [
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "proposed 3"
+  },
+  {
+   "slug": "lab-c",
+   "name": "Lab Tenant C (Essentials)",
+   "account": "ACCT06",
+   "edition": "Duo Essentials",
+   "status": "RED",
+   "lab": true,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T08:20:00Z",
+      "age_h": 50.7,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 41363
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 631,
+      "samples_raw": "567,853,696,0"
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-08-10T14:14:00Z",
+      "age_h": 644.8
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T09:06:58Z",
+    "age_h": 1.9,
+    "auth_rows": 0,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 204.8,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "RED",
+     "ok": false,
+     "tables": 5,
+     "rows_stuck": 16,
+     "fix": "python schema_drift.py --tenant lab-c --apply",
+     "detail": "auth_logs(_merged,_staged_at), telephony_logs(_merged,_staged_at), admin_logs(_merged,_staged_at), trust_monitor_events(_merged,_staged_at), offline_enrollment_logs(_merged,_staged_at)."
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 30,
+    "gap_dates_shown": [
+     "2026-09-01",
+     "2026-09-02",
+     "2026-09-03",
+     "2026-09-04",
+     "2026-09-05"
+    ],
+    "shapes_24h": 215
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 5,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-06T09:07:00Z",
+    "users": 0,
+    "admins": 0,
+    "telephony_credits": 2000,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 0
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "3"
+    }
+   },
+   "frameworks": [
+    "SOC2",
+    "CIS_Controls_v8"
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "no data",
+     "secondary": "never received",
+     "limit": "",
+     "checkpoint_note": "checkpoint missing",
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "AMBER",
+     "primary": "2d",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": "checkpoint 27d old",
+     "checkpoint_status": "AMBER"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Schema drift",
+     "text": "5 tables missing merge columns, 16 rows stuck in staging"
+    },
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony freshness",
+     "text": "no rows ever received"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (0 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "checkpoint file missing in container"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (41.4K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 631"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-08-10 14:14 UTC (27d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "5 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 2,
+   "warn": 10,
+   "headline": "Schema drift 5 tables missing merge columns, 16 rows stuck in staging; Gaps (30d) 30 days with no data. Includes 2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04, 2026-09-05",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "1.9h",
+    "secondary": "+0 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "RED",
+    "primary": "16 stuck",
+    "secondary": "5 tables"
+   },
+   "healthy": [
+    "API pull",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "proposed 3"
+  },
+  {
+   "slug": "tenant-e",
+   "name": "Customer E (Non-Production)",
+   "account": "ACCT08",
+   "edition": "Duo Premier",
+   "status": "RED",
+   "lab": false,
+   "streams": {
+    "auth": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T20:12:00Z",
+      "age_h": 38.8,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 2498
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T20:12:00Z",
+      "age_h": 38.8
+     }
+    },
+    "telephony": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T10:04:00Z",
+      "age_h": 48.9,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 99
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T10:04:00Z",
+      "age_h": 48.9
+     }
+    },
+    "admin": {
+     "freshness": {
+      "status": "GREEN",
+      "last_seen": "2026-09-04T14:50:00Z",
+      "age_h": 44.2,
+      "threshold_h": null
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 147869
+     },
+     "dow": {
+      "status": "AMBER",
+      "yesterday": 0,
+      "median": 632,
+      "samples_raw": "569,853,696,468"
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": "2026-09-04T14:50:00Z",
+      "age_h": 44.2
+     }
+    },
+    "trust_monitor": {
+     "freshness": {
+      "status": "AMBER",
+      "last_seen": null,
+      "age_h": null,
+      "threshold_h": null,
+      "no_data": true
+     },
+     "ingest": {
+      "status": "AMBER",
+      "rows_24h": 0,
+      "lifetime": 0
+     },
+     "dow": {
+      "status": "GREEN",
+      "yesterday": 0,
+      "median": 0
+     },
+     "checkpoint": {
+      "status": "AMBER",
+      "at": null,
+      "age_h": null,
+      "missing": true
+     }
+    }
+   },
+   "pull": {
+    "status": "GREEN",
+    "completed_at": "2026-09-06T09:38:41Z",
+    "age_h": 1.4,
+    "auth_rows": 1,
+    "tel_rows": 0
+   },
+   "db": {
+    "size_mb": 852.2,
+    "wal_mb": 0.0,
+    "drift": {
+     "status": "GREEN",
+     "ok": true
+    }
+   },
+   "quality": {
+    "status": "RED",
+    "gap_days_30d": 9,
+    "gap_dates_shown": [
+     "2026-08-22",
+     "2026-08-23",
+     "2026-08-29",
+     "2026-08-30",
+     "2026-09-05"
+    ],
+    "shapes_24h": 748
+   },
+   "slo": {
+    "auth_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "telephony_freshness": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    },
+    "ingest_volume": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.5,
+     "samples": 0
+    },
+    "container_health": {
+     "status": "INFO",
+     "warming": true,
+     "target": 99.0,
+     "samples": 0
+    }
+   },
+   "container_errors": {
+    "status": "AMBER",
+    "lines": 1,
+    "window": 200
+   },
+   "security": {
+    "bypass_status": "GREEN",
+    "bypass_codes": 0,
+    "bypass_threshold": 5,
+    "snapshot_at": "2026-09-06T09:38:43Z",
+    "users": 53500,
+    "admins": 8,
+    "telephony_credits": 97685,
+    "admin_actions_24h": 0
+   },
+   "cost": {
+    "status": "GREEN",
+    "credits_24h": 0,
+    "telephony_txns_24h": 0,
+    "active_users": 43500
+   },
+   "changes": {
+    "duo_releases_7d": 1,
+    "latest_release": "2026-09-03",
+    "deploys_24h": 0,
+    "change_log": {
+     "proposed": "18",
+     "n/a": "1"
+    }
+   },
+   "frameworks": [
+    "HIPAA",
+    "HITRUST_CSF",
+    "NIST_CSF_2.0"
+   ],
+   "nonprod": true,
+   "cells": {
+    "auth": {
+     "status": "AMBER",
+     "primary": "38.8h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    },
+    "telephony": {
+     "status": "AMBER",
+     "primary": "2d",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    },
+    "admin": {
+     "status": "AMBER",
+     "primary": "44.2h",
+     "secondary": "0 rows/24h",
+     "limit": "",
+     "checkpoint_note": null,
+     "checkpoint_status": "AMBER"
+    }
+   },
+   "issues": [
+    {
+     "status": "RED",
+     "check": "Gaps (30d)",
+     "text": "9 days with no data. Includes 2026-08-22, 2026-08-23, 2026-08-29, 2026-08-30, 2026-09-05"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth ingest",
+     "text": "0 rows in 24h (2.5K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Auth checkpoint",
+     "text": "DLS checkpoint 2026-09-04 20:12 UTC (38.8h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony ingest",
+     "text": "0 rows in 24h (99 lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Telephony checkpoint",
+     "text": "DLS checkpoint 2026-09-04 10:04 UTC (2d old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin ingest",
+     "text": "0 rows in 24h (147.9K lifetime)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin volume",
+     "text": "yesterday 0 vs same-weekday median 632"
+    },
+    {
+     "status": "AMBER",
+     "check": "Admin checkpoint",
+     "text": "DLS checkpoint 2026-09-04 14:50 UTC (44.2h old)"
+    },
+    {
+     "status": "AMBER",
+     "check": "Container log",
+     "text": "1 ERROR lines in the last 200 log lines"
+    }
+   ],
+   "err": 1,
+   "warn": 8,
+   "headline": "Gaps (30d) 9 days with no data. Includes 2026-08-22, 2026-08-23, 2026-08-29, 2026-08-30, 2026-09-05; Auth ingest 0 rows in 24h (2.5K lifetime)",
+   "pull_cell": {
+    "status": "GREEN",
+    "primary": "1.4h",
+    "secondary": "+1 auth / +0 tel"
+   },
+   "drift_cell": {
+    "status": "GREEN",
+    "primary": "parity",
+    "secondary": ""
+   },
+   "healthy": [
+    "staging parity",
+    "API pull",
+    "telephony spend",
+    "bypass codes"
+   ],
+   "change_summary": "n/a 1, proposed 18"
+  }
+ ],
+ "email_rows": [
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer A: Telephony, Admin stalled",
+   "why": "Telephony, Admin stopped arriving while auth is still flowing, so the container is alive but these streams are dead. DLS checkpoints are old (Telephony 142d, Admin 109d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "tenant-a"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-a-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-a-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-a && python pull.py --logs-only   # streams: telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-a",
+     "note": null
+    }
+   ],
+   "n": 1
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer B: Telephony stalled",
+   "why": "Telephony stopped arriving while auth is still flowing, so the container is alive but this stream is dead. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
+   "tenants": [
+    "tenant-b"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-b-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-b-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-b && python pull.py --logs-only   # streams: telephony",
+     "note": "backfill while DLS catches up"
+    }
+   ],
+   "n": 2
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": false,
+   "title": "Customer C: Admin stalled",
+   "why": "Admin stopped arriving while auth is still flowing, so the container is alive but this stream is dead. DLS checkpoints are old (Admin 116d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "tenant-c"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-c-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-c-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-c",
+     "note": null
+    }
+   ],
+   "n": 3
+  },
+  {
+   "severity": "AMBER",
+   "group": "pull",
+   "title": "API pull has not completed in over 24h for 3 tenants",
+   "why": "The scheduled pull is the safety net when DLS drops a stream. Customer C last ran 26.9h ago; Lab Tenant A (Premier) last ran 27.5h ago; Lab Tenant B (Advantage) last ran 27h ago. The report's scheduled-task check found zero tasks and nssm is not on PATH, so the report cannot see the scheduler on this host: verify it directly.",
+   "tenants": [
+    "tenant-c",
+    "lab-a",
+    "lab-b"
+   ],
+   "nonprod": false,
+   "commands": [
+    {
+     "cmd": "schtasks /Query /FO LIST /V | findstr /I \"Duo-Analytics\"",
+     "note": "on the report host"
+    },
+    {
+     "cmd": "nssm status Duo-Analytics",
+     "note": null
+    }
+   ],
+   "n": 6
+  }
+ ],
+ "email_rows_nonprod": [
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant B (Advantage): Auth, Telephony, Admin not flowing",
+   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream. Staging tables are missing the merge columns, so 1,726 rows are stuck and nothing lands until the drift fix runs.",
+   "tenants": [
+    "lab-b"
+   ],
+   "commands": [
+    {
+     "cmd": "python schema_drift.py --tenant lab-b --apply",
+     "note": "first: unblock the merge"
+    },
+    {
+     "cmd": "docker restart lab-b-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-b-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-b && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant lab-b",
+     "note": null
+    }
+   ],
+   "n": 4
+  },
+  {
+   "severity": "RED",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant C (Essentials): Auth, Telephony, Admin not flowing",
+   "why": "Auth, Telephony never delivered a row and the checkpoint files do not exist in the container, so DLS has not completed a first sync for these streams. Admin stopped arriving. DLS checkpoints are old (Admin 27d), so DLS has not written those streams in a long time and the API pull has been the real source. Staging tables are missing the merge columns, so 16 rows are stuck and nothing lands until the drift fix runs.",
+   "tenants": [
+    "lab-c"
+   ],
+   "commands": [
+    {
+     "cmd": "python schema_drift.py --tenant lab-c --apply",
+     "note": "first: unblock the merge"
+    },
+    {
+     "cmd": "docker restart lab-c-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-c-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-c && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant lab-c",
+     "note": null
+    }
+   ],
+   "n": 5
+  },
+  {
+   "severity": "AMBER",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Lab Tenant A (Premier): Auth, Telephony stalled",
+   "why": "Auth, Telephony stopped arriving. DLS checkpoints are old (Telephony 51d), so DLS has not written those streams in a long time and the API pull has been the real source.",
+   "tenants": [
+    "lab-a"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart lab-a-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps lab-a-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=lab-a && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    }
+   ],
+   "n": 7
+  },
+  {
+   "severity": "AMBER",
+   "group": "stream",
+   "nonprod": true,
+   "title": "Customer E (Non-Production): Auth, Telephony, Admin stalled",
+   "why": "Auth, Telephony, Admin stopped arriving. Checkpoints match the last rows, so this is a recent stall, not a long-dead stream.",
+   "tenants": [
+    "tenant-e"
+   ],
+   "commands": [
+    {
+     "cmd": "docker restart tenant-e-duologsync",
+     "note": null
+    },
+    {
+     "cmd": "docker compose -f docker/duologsync/compose.customer-tenants.yml up -d --no-deps tenant-e-dls",
+     "note": "only if the restart does not clear it"
+    },
+    {
+     "cmd": "set DUO_TENANT_SLUG=tenant-e && python pull.py --logs-only   # streams: auth, telephony",
+     "note": "backfill while DLS catches up"
+    },
+    {
+     "cmd": "python pull_activity.py --tenant tenant-e",
+     "note": null
+    }
+   ],
+   "n": 8
+  }
+ ],
+ "email_info_count": 2
 }

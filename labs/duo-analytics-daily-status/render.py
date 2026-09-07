@@ -137,6 +137,14 @@ def humanize_check(name: str) -> str:
     return name.replace("_", " ")
 
 
+def first_sentence(text: str) -> str:
+    """The lead sentence of a longer explanation, for a one-line email row."""
+    if not text:
+        return text
+    cut = text.find(". ")
+    return text[:cut + 1] if cut != -1 else text
+
+
 # ------------------------------------------------------------------------ derivations
 def worst(*statuses: str) -> str:
     return min((s for s in statuses if s), key=lambda s: SEVERITY_RANK.get(s, 9), default="GREEN")
@@ -389,7 +397,22 @@ def enrich(model: dict) -> dict:
         else worst(*(t["status"] for t in tenants))
     ts = datetime.fromisoformat(r["generated_at"].replace("Z", "+00:00"))
     r["date_long"] = ts.strftime("%A %-d %B %Y")
+    r["date_short"] = ts.strftime("%b %d, %Y")
     r["time_utc"] = ts.strftime("%H:%M UTC")
+    needing_action = s["tenants_red"] + s["tenants_amber"]
+    if needing_action:
+        r["subject"] = (f"Duo Analytics [{sev_label(r['overall'])}] "
+                        f"{needing_action} customer tenant{'s' if needing_action != 1 else ''} "
+                        f"need action — {r['date_short']}")
+    else:
+        r["subject"] = f"Duo Analytics [OK] All customer tenants healthy — {r['date_short']}"
+    # Condensed for the email body: customer-affecting actions first (the
+    # things this alert exists to report), lab/non-prod actions after under
+    # their own count, informational items dropped to a single footnote.
+    actionable = [a for a in model["actions"] if a["severity"] in ("RED", "AMBER")]
+    model["email_rows"] = [a for a in actionable if not a["nonprod"]]
+    model["email_rows_nonprod"] = [a for a in actionable if a["nonprod"]]
+    model["email_info_count"] = len(model["actions"]) - len(actionable)
     return model
 
 
@@ -430,18 +453,22 @@ def anonymize(model: dict) -> dict:
 
 
 # ------------------------------------------------------------------------------- main
-def render(model: dict, anonymize_output: bool = False) -> str:
+TEMPLATES = {"email": "daily_status_email.html.j2", "full": "daily_status.html.j2"}
+
+
+def render(model: dict, anonymize_output: bool = False, style: str = "email") -> str:
     if anonymize_output:
         model = anonymize(model)
     model = enrich(model)
     env = Environment(loader=FileSystemLoader(HERE / "templates"), autoescape=True,
                       trim_blocks=True, lstrip_blocks=True)
     env.filters.update({"age": fmt_age, "int": fmt_int, "compact": fmt_compact, "mb": fmt_mb, "ts": fmt_ts,
-                        "duration": fmt_duration, "sev": sev_label, "glyph": sev_glyph, "human": humanize_check})
+                        "duration": fmt_duration, "sev": sev_label, "glyph": sev_glyph, "human": humanize_check,
+                        "first_sentence": first_sentence})
     env.globals["STREAMS"] = STREAMS
     env.globals["DEPRECATED"] = [label for key, label, _ in ALL_STREAMS if key in DEPRECATED_STREAMS]
     env.globals["RUNBOOK"] = RUNBOOK
-    return env.get_template("daily_status.html.j2").render(m=model)
+    return env.get_template(TEMPLATES[style]).render(m=model)
 
 
 def main() -> None:
@@ -449,10 +476,13 @@ def main() -> None:
     ap.add_argument("model", type=Path, help="fleet-status JSON")
     ap.add_argument("-o", "--out", type=Path, required=True, help="output HTML path")
     ap.add_argument("--anonymize", action="store_true", help="replace tenant identity with neutral labels")
+    ap.add_argument("--style", choices=sorted(TEMPLATES), default="email",
+                    help="email: plain, terse, table-based, matches a Duo admin alert (default, this is what gets mailed). "
+                         "full: the dashboard — action queue, stream matrix, tenant detail — for a linked web view.")
     args = ap.parse_args()
     model = json.loads(args.model.read_text())
-    args.out.write_text(render(model, args.anonymize))
-    print(f"wrote {args.out} ({args.out.stat().st_size // 1024} KB)")
+    args.out.write_text(render(model, args.anonymize, args.style))
+    print(f"wrote {args.out} ({args.out.stat().st_size // 1024} KB, style={args.style})")
 
 
 if __name__ == "__main__":
