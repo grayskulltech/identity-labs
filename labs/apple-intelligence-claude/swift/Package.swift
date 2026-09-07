@@ -14,6 +14,7 @@ let package = Package(
     ],
     products: [
         .library(name: "MCPBridge", targets: ["MCPBridge"]),
+        .library(name: "OnDeviceAssistant", targets: ["OnDeviceAssistant"]),
         .library(name: "IdentityAssistant", targets: ["IdentityAssistant"]),
     ],
     dependencies: [
@@ -25,6 +26,9 @@ let package = Package(
     targets: [
         // Model-agnostic: turns an MCP gateway's tools into Foundation Models tools.
         .target(name: "MCPBridge"),
+        // On-device only. Links no model vendor package, so a keyboard extension can
+        // import it without pulling a cloud SDK into a 60 MB process.
+        .target(name: "OnDeviceAssistant", dependencies: ["MCPBridge"]),
         .target(
             name: "IdentityAssistant",
             dependencies: [
@@ -35,6 +39,10 @@ let package = Package(
         .testTarget(
             name: "MCPBridgeTests",
             dependencies: ["MCPBridge"]
+        ),
+        .testTarget(
+            name: "OnDeviceAssistantTests",
+            dependencies: ["OnDeviceAssistant"]
         ),
         .testTarget(
             name: "IdentityAssistantTests",

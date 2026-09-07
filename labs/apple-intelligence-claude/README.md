@@ -28,8 +28,10 @@ which runs a model with tools discovered at runtime from your MCP gateway. That 
 | `docs/03-mdm-guardrails.md` | Restriction keys, data-flow analysis, and the allow/deny decision matrix |
 | `docs/04-in-app-foundation-models.md` | Developer integration with `ClaudeForFoundationModels`, auth modes, routing policy |
 | `docs/05-mcp-gateway-bridge.md` | Siri to your own MCP gateway: App Intent, runtime tool discovery, tool policy |
+| `docs/06-typing-surfaces.md` | Asking by typing, on device only: keyboard extension, Spotlight, and the context budget |
 | `mdm/` | Ready-to-sign configuration profiles for the deny and allow postures |
-| `swift/` | Swift package: `MCPBridge` (MCP tools as Foundation Models tools) and `IdentityAssistant` (Claude, routing, Siri intent) |
+| `swift/` | Swift package: `MCPBridge` (MCP tools as Foundation Models tools), `OnDeviceAssistant` (on-device only, context budgeting, typed intent), `IdentityAssistant` (Claude, routing, Siri intent) |
+| `keyboard/` | Keyboard extension controller: ask a question inline and replace it with the answer |
 | `relay/` | Zero-dependency Node relay for the `.proxied` auth mode and a local MCP gateway stub, with tests |
 
 ## Architecture
