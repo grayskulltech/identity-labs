@@ -2,6 +2,8 @@
 
 Local-first, identity-governed tool execution for the Kingsbrook domain, driven from Apple devices. Design record in `../docs/castleops/`: the design review and ADR-001 through ADR-004.
 
+[ADR-005](../docs/castleops/adr-005-documentation-knowledge-service.md) is a related but separate personal service (a Duo/Cisco/Identity Intelligence documentation search, self-hosted on fortress) — it deliberately sits outside the `contract/v1` gateway described below, for the reasons its own "Relationship to the v1 interface contract" section states.
+
 ## Layout
 
 | Path | What it is | Owner |
