@@ -80,15 +80,27 @@ it, is exactly the kind of complexity ADR-001 argues against.
 | Splunk release notes / what's new | Per-version release notes, Splunk Cloud Platform service updates | [docs.splunk.com](https://docs.splunk.com/Documentation) release-notes pages per product/version | Page diff |
 | Cisco ISE (Identity Services Engine) docs | Admin/config docs for the network-access-control side of Cisco's identity stack — 802.1X, TrustSec, posture, pxGrid | [cisco.com/.../identity-services-engine/series.html](https://www.cisco.com/c/en/us/support/security/identity-services-engine/series.html) | Page diff |
 | Cisco ISE release notes | Per-release notes (3.1–3.5 current) | [cisco.com/.../products-release-notes-list.html](https://www.cisco.com/c/en/us/support/security/identity-services-engine/products-release-notes-list.html) | Page diff |
-| Cisco Secure Access docs | Unified SSE platform docs — ZTNA/Private Access, Secure Web Gateway, CASB, FWaaS, DNS-layer security, all under one product now | [securitydocs.cisco.com/secure-access](https://securitydocs.cisco.com/docs/secure-access/) + [cisco.com/.../secure-access/series.html](https://www.cisco.com/c/en/us/support/security/secure-access/series.html) | Sitemap/page diff |
-| Cisco Umbrella docs | Legacy DNS-security/SIG brand — still the doc tree of record for anything not yet migrated | [cisco.com/.../umbrella/series.html](https://www.cisco.com/c/en/us/support/security/umbrella/series.html) | Page diff |
+| Cisco Secure Access docs | Unified SSE platform docs — ZTNA/Private Access, Secure Web Gateway, CASB, FWaaS, DNS-layer security, DLP (web/cloud/email/endpoint), all under one product now | [securitydocs.cisco.com/docs/csa](https://securitydocs.cisco.com/docs/csa/) + [cisco.com/.../secure-access/series.html](https://www.cisco.com/c/en/us/support/security/secure-access/series.html) | Sitemap/page diff |
+| Cisco Umbrella docs | Legacy DNS-security/SIG brand — still the doc tree of record for anything not yet migrated, includes Umbrella's own DLP pages | [cisco.com/.../umbrella/series.html](https://www.cisco.com/c/en/us/support/security/umbrella/series.html) | Page diff |
+| Cisco Secure Access for agentic AI (MCP Zero Trust) | Registering AI-agent identity in Duo IAM, MCP gateway policy enforcement, tool-level least-privilege, short-lived JIT tokens for agent-to-MCP-server auth | [cisco.com/.../securing-agentic-ai](https://www.cisco.com/site/us/en/solutions/artificial-intelligence/security/securing-agentic-ai/index.html), [blogs.cisco.com](https://blogs.cisco.com/?p=492855), [newsroom.cisco.com](https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2026/m02/cisco-redefines-security-for-the-agentic-era.html) | **No stable product doc tree yet** — this is solution briefs, blog posts, and newsroom announcements (Feb–Mar 2026), not versioned documentation like the rows above. Re-check for a real docs.cisco.com/securitydocs section once the feature ships past announcement stage; until then, page diff on these specific URLs, expect it to move. |
 
-Private Access, SWG, and DNS security don't get their own rows: they're
-capabilities inside Secure Access (and, for now, still partly inside
-Umbrella), not separate products with separate doc trees. Cisco's own
-migration guide (Umbrella → Secure Access, via Security Cloud Control) is
-what actually explains which capability lives where at any given moment —
-index it, don't hand-maintain that mapping here.
+Private Access, SWG, DNS security, and DLP don't get their own rows beyond
+the two above: they're capabilities inside Secure Access (and, for now,
+still partly inside Umbrella), not separate products with separate doc
+trees — DLP specifically lives at `securitydocs.cisco.com/docs/csa/` right
+alongside everything else in that row. Cisco's own migration guide
+(Umbrella → Secure Access, via Security Cloud Control) is what actually
+explains which capability lives where at any given moment — index it, don't
+hand-maintain that mapping here.
+
+**Worth noticing, not acting on**: Cisco's MCP Zero Trust design — register
+agent identity, route all tool traffic through a gateway, issue short-lived
+JIT tokens, enforce tool-level (not just server-level) authorization — is
+the same shape of problem CastleOps's own gateway already solves on the
+Grayskull track (Cedar PDP, DPoP, MCP Streamable HTTP, per-tool policy in
+`contract/v1`). Reading Cisco's approach here is legitimate prior art for
+comparison. It is not, per ADR-001's dual-track rule, a reason to add a
+Cisco dependency to CastleOps.
 
 ## Cisco acquisitions in scope
 
@@ -130,7 +142,7 @@ half of Cisco's identity stack (802.1X, posture, TrustSec) that pairs with
 Duo's MFA/device-trust half in real deployments — same rationale as Duo
 itself being a source, not the acquisitions-in-scope rationale.
 
-Two of these eighteen rows are already a real API (Duo status, Cisco
+Two of these nineteen rows are already a real API (Duo status, Cisco
 openVuln), not a scrape target — start there; it's the fastest path to
 something working and the least likely to get rate-limited or blocked.
 
