@@ -1,0 +1,20 @@
+{
+  "id": "network.guest.provision",
+  "version": 1,
+  "kind": "write",
+  "domain": "network",
+  "description": "Create a time-limited guest WiFi voucher on the guest VLAN.",
+  "arguments": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["guest_name", "duration_minutes", "vlan"],
+    "properties": {
+      "guest_name": { "type": "string", "minLength": 1, "maxLength": 40, "pattern": "^[A-Za-z][A-Za-z '\\-]*$" },
+      "duration_minutes": { "type": "integer", "enum": [60, 120, 240] },
+      "vlan": { "type": "string", "enum": ["guest"] }
+    }
+  },
+  "result": { "max_bytes": 512, "shape": "summary_with_ids" },
+  "worker": "castleops-network",
+  "policy_hints": { "duration_minutes": "long", "vlan": "string" }
+}
