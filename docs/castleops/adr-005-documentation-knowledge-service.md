@@ -6,6 +6,11 @@ research tool, single user, self-hosted on fortress. Nothing in it may depend
 on a Cisco SKU or employee entitlement, per ADR-001 §"Dual-track ownership"
 rule 1.
 
+Naming: "fortress" is the Mac mini's hostname. The system running on it is
+**CastleOps**, and this service is reachable at `castleops.grayskulltech.com`
+once the Cloudflare Tunnel + Access setup in Decision 5 is live — not a
+`fortress.*` domain.
+
 ## Decisions
 
 1. **Index and cite, never mirror.** Store chunked excerpts with embeddings and
@@ -31,7 +36,8 @@ rule 1.
 4. **Prefer the source's own API over scraping, wherever one exists.**
    Two of five sources already have one (below). Scraping is the fallback,
    not the default.
-5. **Runs on fortress, reachable only through Cloudflare Tunnel + Access.**
+5. **Runs on fortress (`castleops.grayskulltech.com`), reachable only
+   through Cloudflare Tunnel + Access.**
    No inbound port on the Mac mini. Cloudflare Access gates who can even
    reach the tunnel (the user's own identity); the MCP server's bearer
    token is the second, independent check behind it.
@@ -167,7 +173,7 @@ something working and the least likely to get rate-limited or blocked.
 
     auth: single-user bearer token, checked on every call
 
-[Cloudflare Tunnel, outbound from fortress — no inbound port]
+[Cloudflare Tunnel, outbound from fortress (castleops.grayskulltech.com) — no inbound port]
 [Cloudflare Access — gates who reaches the tunnel at all]
     -> MCP endpoint, added as a remote MCP connector in ChatGPT / Claude / Gemini / Grok
 ```
