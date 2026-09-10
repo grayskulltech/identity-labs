@@ -75,33 +75,42 @@ it, is exactly the kind of complexity ADR-001 argues against.
 | Cisco Identity Intelligence (Oort) KB | CII docs, blogs, public API reference | [docs.oort.io](https://docs.oort.io) (+ `/blogs`, `/public-api`, `/integrations`) | Sitemap diff |
 | Astrix Security — Learn | NHI (non-human identity) security: guides, glossary, blog — API key / OAuth app / secrets-sprawl risk research | [astrix.security/learn](https://astrix.security/learn/) | Sitemap/RSS diff — confirm `robots.txt` and crawl politeness before scheduling. **Not verified from this session**: astrix.security is blocked by this sandbox's egress proxy, so the actual page structure, sitemap, and feed availability need confirming from fortress directly before this row is built, not assumed from the row above. |
 | WideField Security | Identity threat detection/response docs — identity lifecycle (at rest / in motion / in use) across human, non-human, and AI-agent identities | [widefield.ai](https://www.widefield.ai/) | Page diff. **Time-sensitive**: standalone sale/licensing ended July 31, 2026 per their own site — content is likely being folded into Cisco product pages or pulled down on a schedule this ADR doesn't control. Fetch and archive what's there before it moves, don't wait for a "stable" crawl target that may not exist. |
+| Galileo (AI observability/eval) | Docs, API reference, integration guides for the agent-observability platform Astrix/WideField telemetry is explicitly headed toward | [docs.galileo.ai](https://docs.galileo.ai/what-is-galileo) | Sitemap/page diff |
+| Splunk Enterprise & Cloud Platform docs | Admin/search/product documentation — an operational tool in daily use, not just identity-adjacent research | [help.splunk.com](https://help.splunk.com/en), [docs.splunk.com](https://docs.splunk.com/Documentation) (versioned/legacy) | Page diff |
+| Splunk release notes / what's new | Per-version release notes, Splunk Cloud Platform service updates | [docs.splunk.com](https://docs.splunk.com/Documentation) release-notes pages per product/version | Page diff |
 
 ## Cisco acquisitions in scope
 
-Both of the last two rows are here because Cisco bought them, on the same
-"acquired company, keep indexing its public docs at the acquired domain"
-precedent already set by Oort → Cisco Identity Intelligence above — not
-because they were independently chosen as NHI background reading:
+The last four rows above are here because Cisco bought the companies (or, for
+Splunk, because it's a tool actually run day to day), on the same "acquired
+company, keep indexing its public docs at the acquired domain" precedent
+already set by Oort → Cisco Identity Intelligence — not because each was
+independently chosen as background reading:
 
 | Company | Announced / closed | What Cisco said it's for |
 |---|---|---|
 | [Oort](https://blogs.cisco.com) | 2023 | Became Cisco Identity Intelligence — identity risk correlation across IdPs |
+| Splunk | 2023 | SIEM/observability platform; destination for the identity/session telemetry the three rows below all explicitly feed |
 | [Astrix Security](https://blogs.cisco.com/news/cisco-announces-intent-to-acquire-astrix-security) | Announced May 4, 2026; closed June 29, 2026 (~$350–400M) | NHI discovery/lifecycle/threat detection, integrating into **Cisco Identity Intelligence, Duo, and Secure Access**, with agentic telemetry feeding Splunk |
 | [WideField Security](https://blogs.cisco.com/news/cisco-announces-intent-to-acquire-widefield-security) | Announced June 18, 2026 | Identity/session/activity telemetry normalization and correlation, integrating into **Splunk's Agentic SOC** |
+| [Galileo Technologies](https://blogs.cisco.com/news/cisco-announces-the-intent-to-acquire-galileo) | Announced April 9, 2026; closed May 22, 2026 | Agent-development-lifecycle observability/eval/guardrails, folding into **Splunk's** observability portfolio |
 
-Three straight identity-adjacent acquisitions in three years (Oort, Astrix,
-WideField) is a standing signal this list needs revisiting periodically, not
-a one-time reconciliation — see Build order, step 0, below.
+Four identity- or telemetry-adjacent acquisitions in three years (Oort,
+Galileo, Astrix, WideField) — all converging on Splunk as the place the data
+lands — is a standing signal this list needs revisiting periodically, not a
+one-time reconciliation. See Build order, step 0, below.
 
-Two acquisitions Cisco made in the same window that are **not** in this
-table on purpose: [Galileo Technologies](https://www.cisco.com/site/us/en/about/corporate-development/acquisitions/index.html)
-(April 2026, AI-observability, not identity) and EzDubs (Nov 2025, speech
-translation) — named here so a future pass doesn't waste time re-deciding
-they're out of scope.
+Correction from this ADR's prior revision: Galileo was ruled out here as
+"AI-observability, not identity." That was wrong — Astrix and WideField's own
+announcements name Splunk (which Galileo now strengthens) as where their
+telemetry lands, so Galileo is the same acquisition chain, not a separate
+one. Observability counts. EzDubs (Nov 2025, speech translation) is still
+ruled out — nothing in its own announcement connects it to identity,
+telemetry, or Splunk.
 
-Two of these twelve rows are already a real API, not a scrape target — start
-there; it's the fastest path to something working and the least likely to
-get rate-limited or blocked.
+Two of these fourteen rows are already a real API (Duo status, Cisco
+openVuln), not a scrape target — start there; it's the fastest path to
+something working and the least likely to get rate-limited or blocked.
 
 ## Architecture
 
@@ -159,6 +168,14 @@ get rate-limited or blocked.
   never actually confirmed — the row is a placeholder for "fetch this
   content" until someone (or fortress, which isn't behind this sandbox's
   proxy) actually loads the page and checks.
+- **Splunk's own docs are enormous** — Enterprise, Cloud Platform, and every
+  admin/search-language/app-dev corner of both, spanning many major
+  versions. Indexing all of it defeats "index and cite" as a curation
+  discipline. Scope the crawl to what's actually used day to day (the admin
+  and search-language sections relevant to this deployment, release notes,
+  Cloud Platform service pages) rather than mirroring the whole doc tree —
+  revisit the scope if a specific gap shows up in practice, not
+  preemptively.
 
 ## Build order
 
