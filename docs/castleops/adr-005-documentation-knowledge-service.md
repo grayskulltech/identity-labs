@@ -73,8 +73,14 @@ it, is exactly the kind of complexity ADR-001 argues against.
 | Cisco PSIRT advisories (Duo) | Vulnerability advisories | [cisco.com/.../security/duo/products-security-advisories-list.html](https://www.cisco.com/c/en/us/support/security/duo/products-security-advisories-list.html) | **Cisco's openVuln API** — a real, documented, key-authenticated REST API for PSIRT advisories. Use it instead of scraping HTML; register for an API key via the Cisco API Console first. |
 | Duo status | Incidents, component status | [status.duo.com/api/v2/status.json](https://status.duo.com/api/v2/status.json) (live JSON), [status.duo.com/history.rss](https://status.duo.com/history.rss) (incident history) | Poll the JSON API + the RSS feed — both are real, documented endpoints, no scraping needed |
 | Cisco Identity Intelligence (Oort) KB | CII docs, blogs, public API reference | [docs.oort.io](https://docs.oort.io) (+ `/blogs`, `/public-api`, `/integrations`) | Sitemap diff |
+| Astrix Security — Learn | Non-human identity (NHI) security: guides, glossary, blog — API key / OAuth app / secrets-sprawl risk research | [astrix.security/learn](https://astrix.security/learn/) | Sitemap/RSS diff — confirm `robots.txt` and crawl politeness before scheduling. **Not verified from this session**: astrix.security is blocked by this sandbox's egress proxy, so the actual page structure, sitemap, and feed availability need confirming from fortress directly before this row is built, not assumed from the row above. |
 
-Two of these ten rows are already a real API, not a scrape target — start
+In scope alongside Duo/Cisco/CII: NHI security is the same risk category CII
+correlates (identity risk across IdPs) and the same one the Pipeline
+Automation & Vaulting roadmap's credential-vaulting work touches — Astrix's
+material is background reading for both, not a separate product to track.
+
+Two of these eleven rows are already a real API, not a scrape target — start
 there; it's the fastest path to something working and the least likely to
 get rate-limited or blocked.
 
@@ -129,6 +135,11 @@ get rate-limited or blocked.
   a single user. Don't build that speculatively — try the bearer token
   against all four target clients first, and add a minimal self-issued
   OAuth 2.1 shim only for whichever one actually requires it.
+- **The Astrix Security row was added sight-unseen.** This session's egress
+  proxy blocks astrix.security outright, so its sitemap/RSS structure was
+  never actually confirmed — the row is a placeholder for "fetch this
+  content" until someone (or fortress, which isn't behind this sandbox's
+  proxy) actually loads the page and checks.
 
 ## Build order
 
