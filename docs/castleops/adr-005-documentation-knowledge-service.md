@@ -73,14 +73,33 @@ it, is exactly the kind of complexity ADR-001 argues against.
 | Cisco PSIRT advisories (Duo) | Vulnerability advisories | [cisco.com/.../security/duo/products-security-advisories-list.html](https://www.cisco.com/c/en/us/support/security/duo/products-security-advisories-list.html) | **Cisco's openVuln API** — a real, documented, key-authenticated REST API for PSIRT advisories. Use it instead of scraping HTML; register for an API key via the Cisco API Console first. |
 | Duo status | Incidents, component status | [status.duo.com/api/v2/status.json](https://status.duo.com/api/v2/status.json) (live JSON), [status.duo.com/history.rss](https://status.duo.com/history.rss) (incident history) | Poll the JSON API + the RSS feed — both are real, documented endpoints, no scraping needed |
 | Cisco Identity Intelligence (Oort) KB | CII docs, blogs, public API reference | [docs.oort.io](https://docs.oort.io) (+ `/blogs`, `/public-api`, `/integrations`) | Sitemap diff |
-| Astrix Security — Learn | Non-human identity (NHI) security: guides, glossary, blog — API key / OAuth app / secrets-sprawl risk research | [astrix.security/learn](https://astrix.security/learn/) | Sitemap/RSS diff — confirm `robots.txt` and crawl politeness before scheduling. **Not verified from this session**: astrix.security is blocked by this sandbox's egress proxy, so the actual page structure, sitemap, and feed availability need confirming from fortress directly before this row is built, not assumed from the row above. |
+| Astrix Security — Learn | NHI (non-human identity) security: guides, glossary, blog — API key / OAuth app / secrets-sprawl risk research | [astrix.security/learn](https://astrix.security/learn/) | Sitemap/RSS diff — confirm `robots.txt` and crawl politeness before scheduling. **Not verified from this session**: astrix.security is blocked by this sandbox's egress proxy, so the actual page structure, sitemap, and feed availability need confirming from fortress directly before this row is built, not assumed from the row above. |
+| WideField Security | Identity threat detection/response docs — identity lifecycle (at rest / in motion / in use) across human, non-human, and AI-agent identities | [widefield.ai](https://www.widefield.ai/) | Page diff. **Time-sensitive**: standalone sale/licensing ended July 31, 2026 per their own site — content is likely being folded into Cisco product pages or pulled down on a schedule this ADR doesn't control. Fetch and archive what's there before it moves, don't wait for a "stable" crawl target that may not exist. |
 
-In scope alongside Duo/Cisco/CII: NHI security is the same risk category CII
-correlates (identity risk across IdPs) and the same one the Pipeline
-Automation & Vaulting roadmap's credential-vaulting work touches — Astrix's
-material is background reading for both, not a separate product to track.
+## Cisco acquisitions in scope
 
-Two of these eleven rows are already a real API, not a scrape target — start
+Both of the last two rows are here because Cisco bought them, on the same
+"acquired company, keep indexing its public docs at the acquired domain"
+precedent already set by Oort → Cisco Identity Intelligence above — not
+because they were independently chosen as NHI background reading:
+
+| Company | Announced / closed | What Cisco said it's for |
+|---|---|---|
+| [Oort](https://blogs.cisco.com) | 2023 | Became Cisco Identity Intelligence — identity risk correlation across IdPs |
+| [Astrix Security](https://blogs.cisco.com/news/cisco-announces-intent-to-acquire-astrix-security) | Announced May 4, 2026; closed June 29, 2026 (~$350–400M) | NHI discovery/lifecycle/threat detection, integrating into **Cisco Identity Intelligence, Duo, and Secure Access**, with agentic telemetry feeding Splunk |
+| [WideField Security](https://blogs.cisco.com/news/cisco-announces-intent-to-acquire-widefield-security) | Announced June 18, 2026 | Identity/session/activity telemetry normalization and correlation, integrating into **Splunk's Agentic SOC** |
+
+Three straight identity-adjacent acquisitions in three years (Oort, Astrix,
+WideField) is a standing signal this list needs revisiting periodically, not
+a one-time reconciliation — see Build order, step 0, below.
+
+Two acquisitions Cisco made in the same window that are **not** in this
+table on purpose: [Galileo Technologies](https://www.cisco.com/site/us/en/about/corporate-development/acquisitions/index.html)
+(April 2026, AI-observability, not identity) and EzDubs (Nov 2025, speech
+translation) — named here so a future pass doesn't waste time re-deciding
+they're out of scope.
+
+Two of these twelve rows are already a real API, not a scrape target — start
 there; it's the fastest path to something working and the least likely to
 get rate-limited or blocked.
 
@@ -143,6 +162,13 @@ get rate-limited or blocked.
 
 ## Build order
 
+0. Before each future revision of this ADR, re-check
+   [Cisco's acquisitions list](https://www.cisco.com/site/us/en/about/corporate-development/acquisitions/acquisitions-list-years/index.html)
+   for anything identity/NHI/Zero-Trust-adjacent since the last pass, per
+   "Cisco acquisitions in scope" above. Three hits in three years (Oort,
+   Astrix, WideField) means this is a recurring maintenance step, not a
+   one-off — add the source row or explicitly rule it out (as done above
+   for Galileo/EzDubs), don't leave it unexamined.
 1. Register for a Cisco openVuln API key; confirm `robots.txt` and crawl
    politeness for `help.duo.com` and any other page-scraped source.
 2. SQLite schema: `sources`, `pages(url, content_hash, fetched_at)`,
