@@ -80,6 +80,15 @@ it, is exactly the kind of complexity ADR-001 argues against.
 | Splunk release notes / what's new | Per-version release notes, Splunk Cloud Platform service updates | [docs.splunk.com](https://docs.splunk.com/Documentation) release-notes pages per product/version | Page diff |
 | Cisco ISE (Identity Services Engine) docs | Admin/config docs for the network-access-control side of Cisco's identity stack — 802.1X, TrustSec, posture, pxGrid | [cisco.com/.../identity-services-engine/series.html](https://www.cisco.com/c/en/us/support/security/identity-services-engine/series.html) | Page diff |
 | Cisco ISE release notes | Per-release notes (3.1–3.5 current) | [cisco.com/.../products-release-notes-list.html](https://www.cisco.com/c/en/us/support/security/identity-services-engine/products-release-notes-list.html) | Page diff |
+| Cisco Secure Access docs | Unified SSE platform docs — ZTNA/Private Access, Secure Web Gateway, CASB, FWaaS, DNS-layer security, all under one product now | [securitydocs.cisco.com/secure-access](https://securitydocs.cisco.com/docs/secure-access/) + [cisco.com/.../secure-access/series.html](https://www.cisco.com/c/en/us/support/security/secure-access/series.html) | Sitemap/page diff |
+| Cisco Umbrella docs | Legacy DNS-security/SIG brand — still the doc tree of record for anything not yet migrated | [cisco.com/.../umbrella/series.html](https://www.cisco.com/c/en/us/support/security/umbrella/series.html) | Page diff |
+
+Private Access, SWG, and DNS security don't get their own rows: they're
+capabilities inside Secure Access (and, for now, still partly inside
+Umbrella), not separate products with separate doc trees. Cisco's own
+migration guide (Umbrella → Secure Access, via Security Cloud Control) is
+what actually explains which capability lives where at any given moment —
+index it, don't hand-maintain that mapping here.
 
 ## Cisco acquisitions in scope
 
@@ -121,7 +130,7 @@ half of Cisco's identity stack (802.1X, posture, TrustSec) that pairs with
 Duo's MFA/device-trust half in real deployments — same rationale as Duo
 itself being a source, not the acquisitions-in-scope rationale.
 
-Two of these sixteen rows are already a real API (Duo status, Cisco
+Two of these eighteen rows are already a real API (Duo status, Cisco
 openVuln), not a scrape target — start there; it's the fastest path to
 something working and the least likely to get rate-limited or blocked.
 
@@ -189,6 +198,14 @@ something working and the least likely to get rate-limited or blocked.
   Cloud Platform service pages) rather than mirroring the whole doc tree —
   revisit the scope if a specific gap shows up in practice, not
   preemptively.
+- **Umbrella and Secure Access will say contradictory things about the same
+  feature while the migration is in progress.** A chunk from Umbrella's docs
+  and a chunk from Secure Access's docs can both rank for the same query and
+  disagree — one describing the pre-migration behavior, one post. Store each
+  chunk's source name plainly in the citation (not just the URL) so an
+  answer built from both is visibly mixed-vintage rather than silently
+  wrong; revisit whether Umbrella needs pulling from the index entirely once
+  Cisco's own migration guide says the cutover is complete.
 
 ## Build order
 
