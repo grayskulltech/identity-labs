@@ -78,6 +78,8 @@ it, is exactly the kind of complexity ADR-001 argues against.
 | Galileo (AI observability/eval) | Docs, API reference, integration guides for the agent-observability platform Astrix/WideField telemetry is explicitly headed toward | [docs.galileo.ai](https://docs.galileo.ai/what-is-galileo) | Sitemap/page diff |
 | Splunk Enterprise & Cloud Platform docs | Admin/search/product documentation — an operational tool in daily use, not just identity-adjacent research | [help.splunk.com](https://help.splunk.com/en), [docs.splunk.com](https://docs.splunk.com/Documentation) (versioned/legacy) | Page diff |
 | Splunk release notes / what's new | Per-version release notes, Splunk Cloud Platform service updates | [docs.splunk.com](https://docs.splunk.com/Documentation) release-notes pages per product/version | Page diff |
+| Cisco ISE (Identity Services Engine) docs | Admin/config docs for the network-access-control side of Cisco's identity stack — 802.1X, TrustSec, posture, pxGrid | [cisco.com/.../identity-services-engine/series.html](https://www.cisco.com/c/en/us/support/security/identity-services-engine/series.html) | Page diff |
+| Cisco ISE release notes | Per-release notes (3.1–3.5 current) | [cisco.com/.../products-release-notes-list.html](https://www.cisco.com/c/en/us/support/security/identity-services-engine/products-release-notes-list.html) | Page diff |
 
 ## Cisco acquisitions in scope
 
@@ -108,7 +110,18 @@ one. Observability counts. EzDubs (Nov 2025, speech translation) is still
 ruled out — nothing in its own announcement connects it to identity,
 telemetry, or Splunk.
 
-Two of these fourteen rows are already a real API (Duo status, Cisco
+**Cisco ISE is not in this table on purpose** — it doesn't belong in the
+"recent acquisition chain" story. ISE traces to Cisco's 2004 acquisition of
+Perfigo (Clean Access merged with RADIUS/TACACS into what became ISE 1.0 in
+2011); that's 20 years and one full product generation before the
+Oort→Astrix→WideField→Galileo chain above, with no telemetry relationship to
+Splunk in how Cisco describes either product. It's in the Sources table
+anyway, for a different and simpler reason: ISE is the network-access-control
+half of Cisco's identity stack (802.1X, posture, TrustSec) that pairs with
+Duo's MFA/device-trust half in real deployments — same rationale as Duo
+itself being a source, not the acquisitions-in-scope rationale.
+
+Two of these sixteen rows are already a real API (Duo status, Cisco
 openVuln), not a scrape target — start there; it's the fastest path to
 something working and the least likely to get rate-limited or blocked.
 
