@@ -142,7 +142,7 @@ half of Cisco's identity stack (802.1X, posture, TrustSec) that pairs with
 Duo's MFA/device-trust half in real deployments — same rationale as Duo
 itself being a source, not the acquisitions-in-scope rationale.
 
-Two of these nineteen rows are already a real API (Duo status, Cisco
+Two of these twenty rows are already a real API (Duo status, Cisco
 openVuln), not a scrape target — start there; it's the fastest path to
 something working and the least likely to get rate-limited or blocked.
 
