@@ -1,0 +1,19 @@
+# CODEOWNERS — ownership of record for this repository.
+#
+# Layer 9 of the CastleOps Identity Taxonomy. Per the identity-ownership model a repository is not
+# a Worker and not an identity: it is an asset with an accountable human owner. That owner is
+# recorded canonically on the CMDB-Lite CI as `owner_worker_id`, and mirrored here so it is
+# visible where the work happens.
+#
+#   CMDB CI       ci_type=code_repository, matched on the immutable GitHub node id
+#   Worker        WRK-GARY-TOWNSEND  (HRIS-Lite, the sole HR system of record)
+#   Lane          grayskull
+#   Criticality   standard
+#
+# Advisory today: required-reviewer enforcement needs branch protection, unavailable for private
+# repositories at the current plan tier (R1, open since 2026-06-18). It becomes enforcing with no
+# edit the moment that changes — which is why it is written now.
+#
+# Source of record for classification: grayskulltech/gtownos-ops sync/repo-manifest.json. ADR-007.
+
+* @gt0wn
