@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grayskull.tech/castleops/contract/v1/approval-request.schema.json",
+  "title": "Approval request handed to ApprovalChannel",
+  "type": "object",
+  "required": ["transaction_id", "kind", "requester", "requester_device", "created_at", "expires_at", "approvers", "request_hash"],
+  "additionalProperties": false,
+  "properties": {
+    "transaction_id": { "type": "string", "description": "The only field that may transit APNs." },
+    "kind": { "enum": ["break_glass", "device_enrollment"] },
+    "requester": { "type": "string" },
+    "requester_device": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "approvers": { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Ordered. First is primary." },
+    "request_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "description": "Hash over the full request the approver will see over the overlay. The approver signs this." },
+    "tool": { "type": "string", "description": "break_glass only" },
+    "args_hash": { "type": "string", "description": "break_glass only" },
+    "device_summary": {
+      "type": "object",
+      "description": "device_enrollment only. Fetched by the approver over the overlay, never pushed.",
+      "properties": {
+        "model": { "type": "string" },
+        "attested_os_version": { "type": "string" },
+        "group": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "calendar.events.read",
+  "version": 1,
+  "kind": "read",
+  "domain": "calendar",
+  "description": "List the household calendar events in a window.",
+  "arguments": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["window"],
+    "properties": {
+      "window": { "type": "string", "enum": ["today", "tomorrow", "this_week"] },
+      "calendar": { "type": "string", "enum": ["family", "kids", "adults"], "default": "family" }
+    }
+  },
+  "result": { "max_bytes": 2048, "shape": "summary_with_ids" },
+  "worker": "castleops-calendar",
+  "policy_hints": { "calendar": "string" }
+}
